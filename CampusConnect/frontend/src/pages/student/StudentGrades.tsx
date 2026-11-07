@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../../api/client';
+import { transcriptApi } from '../../api/transcript';
 import { StudentCourseGradeReport } from '../../types/grades';
+import { AcademicTranscriptReport } from '../../types/transcript';
+import { OfficialTranscriptModal } from '../../components/widgets/OfficialTranscriptModal';
 import { 
   Award, 
   BookOpen, 
   Sparkles, 
   ChevronDown, 
   ChevronUp, 
-  AlertCircle
+  AlertCircle,
+  FileText
 } from 'lucide-react';
 
 export const StudentGrades: React.FC = () => {
@@ -15,6 +19,9 @@ export const StudentGrades: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedCourseId, setExpandedCourseId] = useState<number | null>(null);
+  const [transcript, setTranscript] = useState<AcademicTranscriptReport | null>(null);
+  const [isTranscriptOpen, setIsTranscriptOpen] = useState<boolean>(false);
+  const [transcriptLoading, setTranscriptLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchMyGrades = async () => {
@@ -59,14 +66,39 @@ export const StudentGrades: React.FC = () => {
     }
   };
 
+  const handleOpenTranscript = async () => {
+    try {
+      setTranscriptLoading(true);
+      setError(null);
+      const data = await transcriptApi.getMyTranscript();
+      setTranscript(data);
+      setIsTranscriptOpen(true);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to generate academic transcript');
+    } finally {
+      setTranscriptLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Academic Grades & GPA Report</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Review course evaluations, assessment breakdowns, and cumulative grade point performance.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Academic Grades & GPA Report</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Review course evaluations, assessment breakdowns, and cumulative grade point performance.
+          </p>
+        </div>
+
+        <button
+          onClick={handleOpenTranscript}
+          disabled={transcriptLoading}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-sm transition-colors"
+        >
+          <FileText className="w-4 h-4" />
+          {transcriptLoading ? 'Generating...' : 'Official Academic Transcript'}
+        </button>
       </div>
 
       {/* Error Banner */}
@@ -216,6 +248,14 @@ export const StudentGrades: React.FC = () => {
           })
         )}
       </div>
+
+      {/* Official Transcript Modal (Builder Pattern) */}
+      {isTranscriptOpen && transcript && (
+        <OfficialTranscriptModal
+          transcript={transcript}
+          onClose={() => setIsTranscriptOpen(false)}
+        />
+      )}
     </div>
   );
 };
