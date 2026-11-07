@@ -6,6 +6,8 @@ import com.campusconnect.enums.EnrollmentStatus;
 import com.campusconnect.exception.ResourceNotFoundException;
 import com.campusconnect.patterns.strategy.GradingResult;
 import com.campusconnect.patterns.strategy.GradingStrategy;
+import com.campusconnect.patterns.strategy.GradingStrategyFactory;
+import com.campusconnect.patterns.strategy.RelativeGradingStrategy;
 import com.campusconnect.repository.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -13,9 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -27,6 +28,8 @@ public class GradeServiceImpl implements GradeService {
     private final CourseRepository courseRepository;
     private final StudentRepository studentRepository;
     private final GradingStrategy gradingStrategy;
+    private final GradingStrategyFactory gradingStrategyFactory;
+    private final RelativeGradingStrategy relativeGradingStrategy;
 
     public GradeServiceImpl(
             GradeRepository gradeRepository,
@@ -34,7 +37,9 @@ public class GradeServiceImpl implements GradeService {
             EnrollmentRepository enrollmentRepository,
             CourseRepository courseRepository,
             StudentRepository studentRepository,
-            @Qualifier("absoluteGradingStrategy") GradingStrategy gradingStrategy
+            @Qualifier("absoluteGradingStrategy") GradingStrategy gradingStrategy,
+            GradingStrategyFactory gradingStrategyFactory,
+            RelativeGradingStrategy relativeGradingStrategy
     ) {
         this.gradeRepository = gradeRepository;
         this.assessmentComponentRepository = assessmentComponentRepository;
@@ -42,6 +47,8 @@ public class GradeServiceImpl implements GradeService {
         this.courseRepository = courseRepository;
         this.studentRepository = studentRepository;
         this.gradingStrategy = gradingStrategy;
+        this.gradingStrategyFactory = gradingStrategyFactory;
+        this.relativeGradingStrategy = relativeGradingStrategy;
     }
 
     @Override
@@ -87,8 +94,12 @@ public class GradeServiceImpl implements GradeService {
             throw new IllegalArgumentException("Assessment does not belong to the enrolled course");
         }
 
-        // Apply Strategy Pattern
-        GradingResult result = gradingStrategy.calculateGrade(request.marksObtained(), assessment.getMaxMarks());
+        // Apply Strategy Pattern dynamically based on request mode
+        GradingStrategy activeStrategy = request.gradingMode() != null
+                ? gradingStrategyFactory.getStrategy(request.gradingMode())
+                : gradingStrategy;
+
+        GradingResult result = activeStrategy.calculateGrade(request.marksObtained(), assessment.getMaxMarks());
 
         Optional<Grade> existingOpt = gradeRepository.findByEnrollmentIdAndAssessmentId(enrollment.getId(), assessment.getId());
         Grade grade;
@@ -188,6 +199,72 @@ public class GradeServiceImpl implements GradeService {
         }
 
         return reports;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CourseGradeDistributionResponse getCourseGradeDistribution(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + courseId));
+
+        List<Grade> grades = gradeRepository.findByAssessmentCourseId(courseId);
+
+        if (grades.isEmpty()) {
+            return new CourseGradeDistributionResponse(
+                    course.getId(), course.getCode(), course.getTitle(),
+                    0, 0.0, 0.0, 0.0, 0.0,
+                    Collections.emptyMap(), Collections.emptyMap()
+            );
+        }
+
+        List<Double> percentages = grades.stream()
+                .map(g -> g.getMarksObtained()
+                        .multiply(BigDecimal.valueOf(100))
+                        .divide(g.getAssessment().getMaxMarks(), 2, RoundingMode.HALF_UP)
+                        .doubleValue())
+                .toList();
+
+        double sum = percentages.stream().mapToDouble(Double::doubleValue).sum();
+        double mean = sum / percentages.size();
+
+        double variance = percentages.stream()
+                .mapToDouble(p -> Math.pow(p - mean, 2))
+                .sum() / percentages.size();
+        double stdDev = Math.sqrt(variance);
+
+        double maxScore = percentages.stream().mapToDouble(Double::doubleValue).max().orElse(0.0);
+        double minScore = percentages.stream().mapToDouble(Double::doubleValue).min().orElse(0.0);
+
+        Map<String, Long> absoluteCounts = new LinkedHashMap<>();
+        Map<String, Long> relativeCounts = new LinkedHashMap<>();
+
+        for (String letter : List.of("A+", "A", "B+", "B", "C+", "C", "D", "F")) {
+            absoluteCounts.put(letter, 0L);
+            relativeCounts.put(letter, 0L);
+        }
+
+        for (Grade g : grades) {
+            GradingResult absResult = gradingStrategy.calculateGrade(g.getMarksObtained(), g.getAssessment().getMaxMarks());
+            String absDisplay = absResult.gradeLetter().getDisplay();
+            absoluteCounts.put(absDisplay, absoluteCounts.getOrDefault(absDisplay, 0L) + 1);
+
+            GradingResult relResult = relativeGradingStrategy.calculateGradeWithCohort(g.getMarksObtained(), g.getAssessment().getMaxMarks(), mean, stdDev);
+            String relDisplay = relResult.gradeLetter().getDisplay();
+            relativeCounts.put(relDisplay, relativeCounts.getOrDefault(relDisplay, 0L) + 1);
+        }
+
+        return new CourseGradeDistributionResponse(
+                course.getId(),
+                course.getCode(),
+                course.getTitle(),
+                grades.size(),
+                Math.round(mean * 100.0) / 100.0,
+                Math.round(stdDev * 100.0) / 100.0,
+                maxScore,
+                minScore,
+                absoluteCounts,
+                relativeCounts
+        );
     }
 
     private AssessmentResponse mapToAssessmentResponse(AssessmentComponent c) {

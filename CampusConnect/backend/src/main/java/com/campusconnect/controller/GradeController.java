@@ -67,6 +67,12 @@ public class GradeController {
         return ResponseEntity.ok(gradeService.getGradesByCourse(courseId));
     }
 
+    @GetMapping("/course/{courseId}/distribution")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FACULTY')")
+    public ResponseEntity<CourseGradeDistributionResponse> getCourseGradeDistribution(@PathVariable Long courseId) {
+        return ResponseEntity.ok(gradeService.getCourseGradeDistribution(courseId));
+    }
+
     @GetMapping("/student/{studentId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FACULTY', 'ROLE_STUDENT')")
     public ResponseEntity<List<StudentCourseGradeReport>> getStudentGradeReports(@PathVariable Long studentId) {

@@ -12,4 +12,5 @@ public interface GradeService {
     List<GradeResponse> getGradesByCourse(Long courseId);
     List<GradeResponse> getGradesByStudent(Long studentId);
     List<StudentCourseGradeReport> getStudentGradeReports(Long studentId);
+    CourseGradeDistributionResponse getCourseGradeDistribution(Long courseId);
 }

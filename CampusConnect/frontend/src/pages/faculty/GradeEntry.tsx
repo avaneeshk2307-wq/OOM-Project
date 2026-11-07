@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { apiClient } from '../../api/client';
 import { Course } from '../../types/admin';
 import { Enrollment } from '../../types/enrollment';
-import { AssessmentResponse, AssessmentType, GradeResponse } from '../../types/grades';
+import { AssessmentResponse, AssessmentType, GradeResponse, CourseGradeDistribution } from '../../types/grades';
 import { 
   Award, 
   PlusCircle, 
@@ -10,6 +10,8 @@ import {
   AlertCircle, 
   Save, 
   BookOpen, 
+  TrendingUp,
+  BarChart2,
   X
 } from 'lucide-react';
 
@@ -20,6 +22,8 @@ export const GradeEntry: React.FC = () => {
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<number | null>(null);
   const [roster, setRoster] = useState<Enrollment[]>([]);
   const [existingGrades, setExistingGrades] = useState<GradeResponse[]>([]);
+  const [gradingMode, setGradingMode] = useState<'ABSOLUTE' | 'RELATIVE'>('ABSOLUTE');
+  const [distribution, setDistribution] = useState<CourseGradeDistribution | null>(null);
 
   // Form states for creating new assessment component
   const [showNewAssessmentModal, setShowNewAssessmentModal] = useState<boolean>(false);
@@ -61,10 +65,11 @@ export const GradeEntry: React.FC = () => {
 
     const fetchCourseData = async () => {
       try {
-        const [assessmentsRes, rosterRes, gradesRes] = await Promise.all([
+        const [assessmentsRes, rosterRes, gradesRes, distRes] = await Promise.all([
           apiClient.get<AssessmentResponse[]>(`/grades/assessments/course/${selectedCourseId}`),
           apiClient.get<Enrollment[]>(`/enrollments/course/${selectedCourseId}`),
-          apiClient.get<GradeResponse[]>(`/grades/course/${selectedCourseId}`)
+          apiClient.get<GradeResponse[]>(`/grades/course/${selectedCourseId}`),
+          apiClient.get<CourseGradeDistribution>(`/grades/course/${selectedCourseId}/distribution`).catch(() => ({ data: null }))
         ]);
 
         setAssessments(assessmentsRes.data);
@@ -73,6 +78,7 @@ export const GradeEntry: React.FC = () => {
         );
         setRoster(activeStudents);
         setExistingGrades(gradesRes.data);
+        setDistribution(distRes.data);
 
         if (assessmentsRes.data.length > 0) {
           setSelectedAssessmentId(assessmentsRes.data[0].id);
@@ -151,15 +157,20 @@ export const GradeEntry: React.FC = () => {
       const batch = roster.map((student) => ({
         enrollmentId: student.id,
         assessmentId: selectedAssessmentId,
-        marksObtained: marksMap[student.id] ?? 0
+        marksObtained: marksMap[student.id] ?? 0,
+        gradingMode: gradingMode
       }));
 
       const res = await apiClient.post<GradeResponse[]>('/grades/batch', batch);
-      setSuccess(`Grades recorded and evaluated using Strategy Design Pattern for ${res.data.length} students!`);
+      setSuccess(`Grades evaluated using ${gradingMode === 'RELATIVE' ? 'Relative Norm-Referenced Curve' : 'Absolute Criterion'} Strategy for ${res.data.length} students!`);
 
-      // Refresh course grades
-      const gradesRes = await apiClient.get<GradeResponse[]>(`/grades/course/${selectedCourseId}`);
+      // Refresh course grades & distribution
+      const [gradesRes, distRes] = await Promise.all([
+        apiClient.get<GradeResponse[]>(`/grades/course/${selectedCourseId}`),
+        apiClient.get<CourseGradeDistribution>(`/grades/course/${selectedCourseId}/distribution`).catch(() => ({ data: null }))
+      ]);
       setExistingGrades(gradesRes.data);
+      setDistribution(distRes.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to save student grades');
     } finally {
@@ -258,6 +269,73 @@ export const GradeEntry: React.FC = () => {
             </select>
           )}
         </div>
+      </div>
+
+      {/* Strategy Pattern Selection & Cohort Distribution Banner */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-indigo-600" />
+              <h3 className="font-bold text-gray-900 text-sm">Grading Algorithm (GoF Strategy Pattern)</h3>
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Select which polymorphic grading algorithm evaluates student scores during submission.
+            </p>
+          </div>
+
+          <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1">
+            <button
+              type="button"
+              onClick={() => setGradingMode('ABSOLUTE')}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                gradingMode === 'ABSOLUTE'
+                  ? 'bg-white text-indigo-700 shadow-xs'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Absolute Criterion
+            </button>
+            <button
+              type="button"
+              onClick={() => setGradingMode('RELATIVE')}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                gradingMode === 'RELATIVE'
+                  ? 'bg-white text-indigo-700 shadow-xs'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Relative Bell Curve
+            </button>
+          </div>
+        </div>
+
+        {distribution && distribution.totalGradedAssessments > 0 && (
+          <div className="pt-3 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4 text-xs">
+            <div className="flex items-center gap-6">
+              <div>
+                <span className="text-gray-500">Graded Submissions: </span>
+                <span className="font-bold text-gray-900">{distribution.totalGradedAssessments}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">Class Mean (μ): </span>
+                <span className="font-bold text-indigo-600">{distribution.averagePercentage}%</span>
+              </div>
+              <div>
+                <span className="text-gray-500">Std Dev (σ): </span>
+                <span className="font-bold text-purple-600">±{distribution.standardDeviation}%</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <BarChart2 className="w-4 h-4 text-gray-400" />
+              <span className="text-gray-500">Current Distribution Mode: </span>
+              <span className="font-semibold text-gray-800">
+                {gradingMode === 'RELATIVE' ? 'Gaussian Z-Score Curved' : 'Fixed Absolute Thresholds'}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Assessment Component Grade Entry Table */}

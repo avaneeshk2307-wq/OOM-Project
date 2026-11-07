@@ -23,6 +23,20 @@ export interface SubmitGradeRequest {
   enrollmentId: number;
   assessmentId: number;
   marksObtained: number;
+  gradingMode?: 'ABSOLUTE' | 'RELATIVE';
+}
+
+export interface CourseGradeDistribution {
+  courseId: number;
+  courseCode: string;
+  courseTitle: string;
+  totalGradedAssessments: number;
+  averagePercentage: number;
+  standardDeviation: number;
+  highestPercentage: number;
+  lowestPercentage: number;
+  absoluteDistribution: Record<string, number>;
+  relativeDistribution: Record<string, number>;
 }
 
 export interface GradeResponse {
