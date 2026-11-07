@@ -14,6 +14,8 @@ import { FacultyOverview } from '../pages/faculty/FacultyOverview';
 import { StudentOverview } from '../pages/student/StudentOverview';
 import { StudentCatalog } from '../pages/student/StudentCatalog';
 import { StudentEnrollments } from '../pages/student/StudentEnrollments';
+import { AttendanceMarking } from '../pages/faculty/AttendanceMarking';
+import { StudentAttendance } from '../pages/student/StudentAttendance';
 import LandingPage from '../pages/LandingPage';
 
 export const AppRoutes: React.FC = () => {
@@ -42,7 +44,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/faculty" element={<DashboardLayout />}>
           <Route index element={<FacultyOverview />} />
           <Route path="courses" element={<FacultyOverview />} />
-          <Route path="attendance" element={<FacultyOverview />} />
+          <Route path="attendance" element={<AttendanceMarking />} />
           <Route path="grades" element={<FacultyOverview />} />
           <Route path="announcements" element={<FacultyOverview />} />
         </Route>
@@ -54,7 +56,7 @@ export const AppRoutes: React.FC = () => {
           <Route index element={<StudentOverview />} />
           <Route path="catalog" element={<StudentCatalog />} />
           <Route path="courses" element={<StudentEnrollments />} />
-          <Route path="attendance" element={<StudentOverview />} />
+          <Route path="attendance" element={<StudentAttendance />} />
           <Route path="grades" element={<StudentOverview />} />
           <Route path="announcements" element={<StudentOverview />} />
         </Route>

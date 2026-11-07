@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin/courses")
-@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 public class AdminCourseController {
 
     private final CourseService courseService;
@@ -24,22 +23,26 @@ public class AdminCourseController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<CourseResponse> createCourse(@Valid @RequestBody CourseRequest request) {
         CourseResponse created = courseService.createCourse(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FACULTY', 'ROLE_STUDENT')")
     public ResponseEntity<List<CourseResponse>> getAllCourses() {
         return ResponseEntity.ok(courseService.getAllCourses());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FACULTY', 'ROLE_STUDENT')")
     public ResponseEntity<CourseResponse> getCourseById(@PathVariable Long id) {
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<CourseResponse> updateCourse(
             @PathVariable Long id,
             @Valid @RequestBody CourseRequest request
@@ -48,6 +51,7 @@ public class AdminCourseController {
     }
 
     @PutMapping("/{id}/assign-faculty/{facultyId}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<CourseResponse> assignFaculty(
             @PathVariable Long id,
             @PathVariable Long facultyId
@@ -56,6 +60,7 @@ public class AdminCourseController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Map<String, String>> deleteCourse(@PathVariable Long id) {
         courseService.deleteCourse(id);
         return ResponseEntity.ok(Map.of("message", "Course deleted successfully"));
