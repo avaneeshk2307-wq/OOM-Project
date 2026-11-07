@@ -1,80 +1,138 @@
 @startuml sequence-diagram
-title CampusConnect - Course Registration & State Pattern Lifecycle Sequence
+title CampusConnect - Sequence Diagrams (State, Conflict Detection, Observer, & Builder Patterns)
 autonumber
 skinparam responseMessageBelowArrow true
 
-actor "Student" as student
-boundary "React UI\n(StudentCatalog)" as ui
-control "EnrollmentController" as controller
-participant "EnrollmentServiceImpl" as service
-participant "CourseRepository" as courseRepo
-participant "EnrollmentRepository" as enrollRepo
-entity "Enrollment" as enrollment
-participant "EnrollmentStateFactory" as stateFactory
-participant "DraftState" as draftState
-participant "SubmittedState" as submittedState
+== Flow 1: Timetable Scheduling & Mathematical Interval Conflict Detection ==
+
+actor "Admin" as admin
+boundary "TimetableGrid (React)" as ttUi
+control "TimetableController" as ttController
+participant "TimetableService" as ttService
+participant "TimetableRepository" as ttRepo
 database "PostgreSQL DB" as db
 
-student -> ui : Click "Register Course (CS101)"
-activate ui
+admin -> ttUi : Schedule Course (Monday 09:00 - 10:30, LH-101)
+activate ttUi
+ttUi -> ttController : POST /api/v1/timetable
+activate ttController
+ttController -> ttService : scheduleTimetableEntry(request)
+activate ttService
 
-ui -> controller : POST /api/v1/enrollments/register\n{courseId: 10, semester: 3}
-activate controller
+ttService -> ttRepo : findClassroomConflicts(roomId, day, 09:00, 10:30)
+activate ttRepo
+note right of ttRepo: Checks interval intersection: [A.start < B.end] && [A.end > B.start]
+ttRepo --> ttService : emptyList() (Room is available)
+deactivate ttRepo
 
-controller -> service : registerCourse(studentId, request)
-activate service
+ttService -> ttRepo : findFacultyConflicts(facultyId, day, 09:00, 10:30)
+activate ttRepo
+ttRepo --> ttService : emptyList() (Faculty is free)
+deactivate ttRepo
 
-service -> courseRepo : findById(courseId)
-activate courseRepo
-courseRepo --> service : course (capacity=60)
-deactivate courseRepo
+ttService -> ttRepo : save(new TimetableEntry(...))
+activate ttRepo
+ttRepo -> db : INSERT into timetables
+db --> ttRepo : saved
+ttRepo --> ttService : savedEntry
+deactivate ttRepo
 
-service -> enrollRepo : existsByStudentIdAndCourseIdAndStatusNot(studentId, courseId, DROPPED)
-activate enrollRepo
-enrollRepo --> service : false (No duplicate active registration)
-deactivate enrollRepo
+ttService --> ttController : TimetableResponse
+deactivate ttService
+ttController --> ttUi : 201 Created (TimetableEntry JSON)
+deactivate ttController
+ttUi --> admin : Show scheduled slot on weekly grid
+deactivate ttUi
 
-service -> enrollRepo : countByCourseIdAndStatus(courseId, ENROLLED)
-activate enrollRepo
-enrollRepo --> service : 42 (Within course capacity limit)
-deactivate enrollRepo
+== Flow 2: Grade Publication & Observer Pattern Persistent Notification ==
 
-create enrollment
-service -> enrollment : new Enrollment(student, course, 3)
-activate enrollment
-enrollment --> service : enrollment (status=DRAFT)
-deactivate enrollment
+actor "Faculty" as facultyUser
+boundary "GradeEntry (React)" as gradeUi
+control "GradeController" as gradeController
+participant "GradeServiceImpl" as gradeService
+participant "GradingStrategyFactory" as stratFactory
+participant "RelativeGradingStrategy" as relStrategy
+participant "ApplicationEventPublisher" as eventPub
+participant "AcademicEventListener" as obsListener
+participant "NotificationService" as notifService
 
-service -> stateFactory : getState(DRAFT)
-activate stateFactory
-stateFactory --> service : draftState
-deactivate stateFactory
+facultyUser -> gradeUi : Submit Assessment Marks (Relative Bell Curve)
+activate gradeUi
+gradeUi -> gradeController : POST /api/v1/grades
+activate gradeController
+gradeController -> gradeService : recordGrade(request)
+activate gradeService
 
-service -> draftState : submit(enrollment)
-activate draftState
-draftState -> enrollment : transitionTo(SUBMITTED)
-activate enrollment
-enrollment --> draftState : updated
-deactivate enrollment
-draftState --> service : void
-deactivate draftState
+gradeService -> stratFactory : getStrategy(RELATIVE)
+activate stratFactory
+stratFactory --> gradeService : relStrategy
+deactivate stratFactory
 
-service -> enrollRepo : save(enrollment)
-activate enrollRepo
-enrollRepo -> db : INSERT INTO enrollments (..., status='SUBMITTED')
-activate db
-db --> enrollRepo : saved record (id=101)
-deactivate db
-enrollRepo --> service : savedEnrollment
-deactivate enrollRepo
+gradeService -> relStrategy : calculateGrade(marks, maxMarks)
+activate relStrategy
+note right of relStrategy: Computes Normal Distribution Z-Score\nZ = (X - μ) / σ
+relStrategy --> gradeService : GradingResult (letterGrade='A', gradePoint=4.0)
+deactivate relStrategy
 
-service --> controller : EnrollmentResponse (status=SUBMITTED)
-deactivate service
+gradeService -> eventPub : publishEvent(new GradePublishedEvent(...))
+activate eventPub
+eventPub -> obsListener : onGradePublished(event)
+activate obsListener
 
-controller --> ui : HTTP 201 Created {status: "SUBMITTED"}
-deactivate controller
+obsListener -> notifService : sendNotification(studentUserId, "Grade Published", ...)
+activate notifService
+notifService -> db : INSERT into notifications (is_read=false)
+db --> notifService : saved
+notifService --> obsListener : notification
+deactivate notifService
+deactivate obsListener
+deactivate eventPub
 
-ui --> student : Display "Application Submitted (Pending Approval)"
-deactivate ui
+gradeService --> gradeController : GradeResponse
+deactivate gradeService
+gradeController --> gradeUi : 200 OK
+deactivate gradeController
+gradeUi --> facultyUser : Display Grade Confirmation
+deactivate gradeUi
+
+== Flow 3: GoF Builder Pattern Academic Transcript Assembly ==
+
+actor "Student" as studentUser
+boundary "OfficialTranscriptModal (React)" as transUi
+control "TranscriptController" as transController
+participant "TranscriptService" as transService
+participant "TranscriptDirector" as director
+participant "ConcreteTranscriptBuilder" as builder
+participant "AcademicTranscriptReport" as report
+
+studentUser -> transUi : Click "Generate Official Transcript"
+activate transUi
+transUi -> transController : GET /api/v1/transcripts/my-transcript
+activate transController
+transController -> transService : generateTranscript(studentId)
+activate transService
+
+transService -> director : constructTranscript(student, enrollments, grades)
+activate director
+
+director -> builder : reset()
+activate builder
+director -> builder : buildStudentInfo(student)
+director -> builder : addCourseRecord(courseRecord)
+note right of builder: Formats grade points, weighted GPA, credits
+director -> builder : buildAcademicSummary(earnedCredits, gpa, standing)
+director -> builder : buildOfficialSignature(registrarName, sealId)
+director -> builder : getResult()
+builder --> director : report
+deactivate builder
+
+director --> transService : report
+deactivate director
+transService --> transController : report
+deactivate transService
+transController --> transUi : 200 OK (Official Transcript JSON)
+deactivate transController
+transUi --> studentUser : Display Credentialed Watermarked Transcript with Print & Verification Seal
+deactivate transUi
 
 @enduml

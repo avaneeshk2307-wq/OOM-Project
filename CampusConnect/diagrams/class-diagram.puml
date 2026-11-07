@@ -1,11 +1,11 @@
 @startuml class-diagram
-title CampusConnect - Domain Object Model & Design Patterns (Phase 1)
+title CampusConnect - Complete Domain Object Model & GoF Design Patterns (Phase 1 & Phase 2)
 skinparam classAttributeIconSize 0
 skinparam monochrome false
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-package "com.campusconnect.entity (Core Domain Model)" {
+package "com.campusconnect.entity (Core Domain Entities)" {
 
     abstract class Person {
         - Long id
@@ -67,8 +67,76 @@ package "com.campusconnect.entity (Core Domain Model)" {
         + getTitle(): String
         + getCredits(): int
         + getCapacity(): int
-        + assignFaculty(Faculty): void
-        + addAssessmentComponent(AssessmentComponent): void
+        + hasAvailableSeats(long): boolean
+        + assignInstructor(Faculty): void
+        + removeInstructor(): void
+    }
+
+    class Classroom {
+        - Long id
+        - String roomNumber
+        - String building
+        - int capacity
+        - RoomType roomType
+        + getId(): Long
+        + getRoomNumber(): String
+        + getBuilding(): String
+        + getCapacity(): int
+        + getRoomType(): RoomType
+    }
+
+    class TimetableEntry {
+        - Long id
+        - DayOfWeek dayOfWeek
+        - LocalTime startTime
+        - LocalTime endTime
+        - Course course
+        - Classroom classroom
+        - Faculty faculty
+        + getId(): Long
+        + getDayOfWeek(): DayOfWeek
+        + getStartTime(): LocalTime
+        + getEndTime(): LocalTime
+        + conflictsWith(TimetableEntry): boolean
+    }
+
+    class Notification {
+        - Long id
+        - UserAccount user
+        - String title
+        - String message
+        - NotificationType type
+        - boolean isRead
+        - Instant createdAt
+        + markAsRead(): void
+        + isRead(): boolean
+    }
+
+    class AuditLog {
+        - Long id
+        - AuditAction action
+        - String entityName
+        - String entityId
+        - String performedByUsername
+        - String details
+        - String ipAddress
+        - Instant createdAt
+        + getAction(): AuditAction
+        + getPerformedByUsername(): String
+        + getDetails(): String
+    }
+
+    class Enrollment {
+        - Long id
+        - EnrollmentStatus status
+        - Instant enrolledAt
+        + getId(): Long
+        + getStatus(): EnrollmentStatus
+        + request(): void
+        + approve(): void
+        + enroll(): void
+        + drop(): void
+        + reject(): void
     }
 
     class AssessmentComponent {
@@ -76,59 +144,40 @@ package "com.campusconnect.entity (Core Domain Model)" {
         - String name
         - AssessmentType type
         - BigDecimal maxMarks
-        - BigDecimal weightagePercentage
+        - BigDecimal weightage
         + getId(): Long
         + getName(): String
-        + getType(): AssessmentType
         + getMaxMarks(): BigDecimal
-        + getWeightagePercentage(): BigDecimal
+        + getWeightage(): BigDecimal
     }
 
-    class Enrollment {
+    class Grade {
         - Long id
-        - int semester
-        - EnrollmentStatus status
-        - Instant registeredAt
+        - BigDecimal marksObtained
+        - GradeLetter letterGrade
+        - double gradePoint
         + getId(): Long
-        + getStatus(): EnrollmentStatus
-        + submit(): void
-        + approve(): void
-        + finalizeEnrollment(): void
-        + drop(): void
-        + reject(): void
+        + getMarksObtained(): BigDecimal
+        + getLetterGrade(): GradeLetter
+        + getGradePoint(): double
     }
 
     class AttendanceSession {
         - Long id
         - LocalDate sessionDate
         - String topic
-        - Instant createdAt
         + getId(): Long
         + getSessionDate(): LocalDate
         + getTopic(): String
-        + recordStudentAttendance(Student, AttendanceStatus, String): AttendanceRecord
-        + getPresentCount(): long
+        + recordStudentAttendance(Student, AttendanceStatus, String): void
     }
 
     class AttendanceRecord {
         - Long id
         - AttendanceStatus status
         - String remarks
-        + getId(): Long
         + getStatus(): AttendanceStatus
-        + getRemarks(): String
-        + updateStatus(AttendanceStatus, String): void
-    }
-
-    class Grade {
-        - Long id
-        - BigDecimal marksObtained
-        - String letterGrade
-        - Instant gradedAt
-        + getId(): Long
-        + getMarksObtained(): BigDecimal
-        + getLetterGrade(): String
-        + setMarks(BigDecimal, String): void
+        + isPresent(): boolean
     }
 
     class UserAccount {
@@ -137,28 +186,15 @@ package "com.campusconnect.entity (Core Domain Model)" {
         - String passwordHash
         - Role role
         - boolean enabled
-        + getId(): Long
         + getUsername(): String
         + getRole(): Role
         + isEnabled(): boolean
-    }
-
-    class Announcement {
-        - Long id
-        - String title
-        - String content
-        - Role targetRole
-        - Instant createdAt
-        + getId(): Long
-        + getTitle(): String
-        + getContent(): String
-        + getTargetRole(): Role
     }
 }
 
 package "com.campusconnect.patterns.state (State Pattern)" {
     interface EnrollmentState {
-        + submit(Enrollment): void
+        + request(Enrollment): void
         + approve(Enrollment): void
         + finalizeEnrollment(Enrollment): void
         + drop(Enrollment): void
@@ -166,14 +202,11 @@ package "com.campusconnect.patterns.state (State Pattern)" {
         + getStatus(): EnrollmentStatus
     }
 
-    abstract class AbstractEnrollmentState implements EnrollmentState
-
-    class DraftState extends AbstractEnrollmentState
-    class SubmittedState extends AbstractEnrollmentState
-    class ApprovedState extends AbstractEnrollmentState
-    class EnrolledState extends AbstractEnrollmentState
-    class DroppedState extends AbstractEnrollmentState
-    class RejectedState extends AbstractEnrollmentState
+    class RequestedState implements EnrollmentState
+    class ApprovedState implements EnrollmentState
+    class EnrolledState implements EnrollmentState
+    class DroppedState implements EnrollmentState
+    class RejectedState implements EnrollmentState
 
     class EnrollmentStateFactory {
         + {static} getState(EnrollmentStatus): EnrollmentState
@@ -191,6 +224,17 @@ package "com.campusconnect.patterns.strategy (Strategy Pattern)" {
         + getStrategyName(): String
     }
 
+    class RelativeGradingStrategy implements GradingStrategy {
+        + calculateRelativeGrades(List<StudentScore>): Map<Long, GradingResult>
+        + calculateGrade(BigDecimal, BigDecimal): GradingResult
+        + getStrategyName(): String
+    }
+
+    class GradingStrategyFactory {
+        + getStrategy(GradingMode): GradingStrategy
+        + getStrategyByName(String): GradingStrategy
+    }
+
     class GradingResult <<record>> {
         + GradeLetter gradeLetter
         + double gradePoint
@@ -199,36 +243,103 @@ package "com.campusconnect.patterns.strategy (Strategy Pattern)" {
     }
 }
 
-' Inheritance Hierarchies (Joined-table JPA)
+package "com.campusconnect.event & Observer Pattern" {
+    class ApplicationEventPublisher <<Spring Framework>> {
+        + publishEvent(Object): void
+    }
+
+    class AcademicEventListener {
+        + onEnrollmentApproved(EnrollmentApprovedEvent): void
+        + onGradePublished(GradePublishedEvent): void
+        + onAttendanceShortage(AttendanceShortageEvent): void
+    }
+
+    class GradePublishedEvent <<record>>
+    class AttendanceShortageEvent <<record>>
+    class EnrollmentApprovedEvent <<record>>
+}
+
+package "com.campusconnect.patterns.builder (Builder Pattern)" {
+    interface TranscriptBuilder {
+        + reset(): void
+        + buildStudentInfo(Student): TranscriptBuilder
+        + buildAcademicSummary(int, double, String): TranscriptBuilder
+        + addCourseRecord(SemesterCourseRecord): TranscriptBuilder
+        + buildOfficialSignature(String, String): TranscriptBuilder
+        + getResult(): AcademicTranscriptReport
+    }
+
+    class ConcreteTranscriptBuilder implements TranscriptBuilder {
+        - AcademicTranscriptReport report
+        + reset(): void
+        + buildStudentInfo(Student): TranscriptBuilder
+        + buildAcademicSummary(int, double, String): TranscriptBuilder
+        + addCourseRecord(SemesterCourseRecord): TranscriptBuilder
+        + buildOfficialSignature(String, String): TranscriptBuilder
+        + getResult(): AcademicTranscriptReport
+    }
+
+    class TranscriptDirector {
+        - TranscriptBuilder builder
+        + constructTranscript(Student, List<Enrollment>, List<Grade>): AcademicTranscriptReport
+    }
+
+    class AcademicTranscriptReport {
+        - StudentBio bio
+        - AcademicSummary summary
+        - List<SemesterCourseRecord> courseRecords
+        - SecuritySignature signature
+    }
+}
+
+' Inheritance Hierarchies
 Person <|-- Student
 Person <|-- Faculty
 Person <|-- Admin
 
-' Aggregation: Department aggregates Students, Faculty, and Courses
+' Aggregations & Associations
 Department "1" o-- "0..*" Student : belongs to
 Department "1" o-- "0..*" Faculty : member of
 Department "1" o-- "0..*" Course : offers
-
-' Association: Faculty teaches Courses
 Faculty "1" <-- "0..*" Course : instructor
 UserAccount "1" *-- "1" Person : credentials adapter
 
-' Composition: Course owns AssessmentComponents (cascaded lifecycle)
-Course "1" *-- "0..*" AssessmentComponent : composed of
+' Timetable Associations
+Course "1" <-- "0..*" TimetableEntry : scheduled for
+Classroom "1" <-- "0..*" TimetableEntry : allocated in
+Faculty "1" <-- "0..*" TimetableEntry : conducted by
 
-' Association & State: Student enrolls in Course
+' Notifications & Audit
+UserAccount "1" <-- "0..*" Notification : recipient
+AuditLog ..> UserAccount : records action of
+
+' Enrollment & State Pattern
 Student "1" <-- "0..*" Enrollment : student
 Course "1" <-- "0..*" Enrollment : course
 Enrollment ..> EnrollmentState : delegates transition to
+EnrollmentStateFactory ..> EnrollmentState : instantiates
 
-' Composition: AttendanceSession owns AttendanceRecords
+' Grading & Strategy Pattern
+Course "1" *-- "0..*" AssessmentComponent : composed of
+Enrollment "1" <-- "0..*" Grade : graded for
+AssessmentComponent "1" <-- "0..*" Grade : evaluated by
+Grade ..> GradingStrategy : evaluated using
+GradingStrategyFactory ..> GradingStrategy : instantiates
+
+' Attendance
 AttendanceSession "1" *-- "0..*" AttendanceRecord : composed of
 AttendanceSession "0..*" --> "1" Course : conducted for
 AttendanceRecord "0..*" --> "1" Student : recorded for
 
-' Association: Grade bridges Enrollment and AssessmentComponent
-Enrollment "1" <-- "0..*" Grade : graded for
-AssessmentComponent "1" <-- "0..*" Grade : evaluated by
-Grade ..> GradingStrategy : evaluated using
+' Observer Pattern Connections
+AcademicEventListener ..> Notification : generates persistent
+ApplicationEventPublisher ..> AcademicEventListener : triggers
+GradePublishedEvent ..> AcademicEventListener
+AttendanceShortageEvent ..> AcademicEventListener
+EnrollmentApprovedEvent ..> AcademicEventListener
+
+' Builder Pattern Connections
+TranscriptDirector o-- TranscriptBuilder : coordinates
+ConcreteTranscriptBuilder ..> AcademicTranscriptReport : produces
 
 @enduml

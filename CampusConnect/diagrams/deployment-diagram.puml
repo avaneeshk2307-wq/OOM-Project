@@ -1,5 +1,5 @@
 @startuml deployment-diagram
-title CampusConnect - Deployment Infrastructure Diagram
+title CampusConnect - Deployment Infrastructure Diagram (Production Ready)
 skinparam node {
     borderColor #3F51B5
     backgroundColor #E8EAF6
@@ -7,7 +7,7 @@ skinparam node {
 
 node "Client Device" as client {
     node "Modern Web Browser\n(Chrome, Firefox, Safari, Edge)" as browser {
-        artifact "Single Page Application (SPA)\nReact 18 + Vite Bundles\nHTML5 / CSS3 / JavaScript (ES2022)" as spaArtifact
+        artifact "Single Page Application (SPA)\nReact 18 + Vite Bundles\nHTML5 / Tailwind CSS / TypeScript" as spaArtifact
     }
 }
 
@@ -29,14 +29,14 @@ node "Database Host / Docker Container" as dbHost {
     node "PostgreSQL 16 Engine" as pgEngine {
         portin "Port 5432" as dbPort
         database "campusconnect DB" as dbInstance {
-            component "Core Relational Tables\nFlyway Migration V1" as schema
+            component "Core & Advanced Relational Tables\nFlyway Migrations V1 & V2" as schema
         }
     }
 }
 
 ' Communication paths
 browser -- webPort : HTTPS / HTTP
-proxy -- apiPort : Forwarded REST / JSON
+proxy -- apiPort : Forwarded REST / JSON + Bearer JWT
 backendJar -- dbPort : JDBC (HikariCP Connection Pool)
 
 @enduml

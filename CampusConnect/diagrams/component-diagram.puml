@@ -1,11 +1,12 @@
 @startuml component-diagram
-title CampusConnect - Architectural Component Diagram (Phase 1)
+title CampusConnect - Architectural Component Diagram (Phase 1 & Phase 2 Complete)
 skinparam componentStyle uml2
 
 package "Frontend Tier (React 18 + Vite + TypeScript + Tailwind CSS)" {
     [AppRoutes / Router] as router
     [AuthContext & RoleGuard] as authGuard
     [Axios API Client] as apiClient
+    [NotificationBell Component] as notifBell
 
     package "Admin UI Pages" {
         [AdminOverview] as adminOverview
@@ -14,21 +15,27 @@ package "Frontend Tier (React 18 + Vite + TypeScript + Tailwind CSS)" {
         [FacultyManagement] as facPage
         [StudentManagement] as stuPage
         [AdminEnrollmentManagement] as adminEnrollPage
+        [AdminTimetable] as adminTtPage
+        [AdminAnalytics] as adminAnalyticsPage
+        [AdminAuditLogs] as adminAuditPage
         [AdminAnnouncements] as adminAnnPage
     }
 
     package "Faculty UI Pages" {
         [FacultyOverview] as facOverview
+        [FacultyTimetable] as facTtPage
         [AttendanceMarking] as attMarkingPage
         [GradeEntry] as gradeEntryPage
     }
 
     package "Student UI Pages" {
         [StudentOverview] as stuOverview
+        [StudentTimetable] as stuTtPage
         [StudentCatalog] as stuCatalogPage
         [StudentEnrollments] as stuEnrollPage
         [StudentAttendance] as stuAttPage
         [StudentGrades] as stuGradePage
+        [OfficialTranscriptModal] as transcriptModal
     }
 }
 
@@ -42,6 +49,11 @@ package "Backend Tier (Spring Boot 3 + Java 21+ Clean Architecture)" {
         [EnrollmentController] as enrollCtrl
         [AttendanceController] as attCtrl
         [GradeController] as gradeCtrl
+        [TimetableController] as ttCtrl
+        [AnalyticsController] as analyticsCtrl
+        [AuditLogController] as auditCtrl
+        [TranscriptController] as transcriptCtrl
+        [NotificationController] as notifCtrl
         [AnnouncementController] as annCtrl
     }
 
@@ -60,22 +72,29 @@ package "Backend Tier (Spring Boot 3 + Java 21+ Clean Architecture)" {
         [EnrollmentService] as enrollSvc
         [AttendanceService] as attSvc
         [GradeService] as gradeSvc
+        [TimetableService] as ttSvc
+        [AnalyticsService] as analyticsSvc
+        [AuditLogService] as auditSvc
+        [TranscriptService] as transcriptSvc
+        [NotificationService] as notifSvc
         [AnnouncementService] as annSvc
     }
 
     package "Design Pattern Engines" {
         [GoF State Pattern\n(EnrollmentState & Factory)] as statePattern
-        [GoF Strategy Pattern\n(GradingStrategy & AbsoluteGrading)] as strategyPattern
+        [GoF Strategy Pattern\n(GradingStrategy, Absolute & Relative)] as strategyPattern
+        [GoF Observer Pattern\n(Spring ApplicationEvents & AcademicEventListener)] as observerPattern
+        [GoF Builder Pattern\n(TranscriptBuilder & TranscriptDirector)] as builderPattern
     }
 
     package "Data Access (Spring Data JPA)" {
-        [JPA Repositories\n(Department, Course, Person, Enrollment, Attendance, Grade)] as repositories
+        [JPA Repositories\n(Department, Course, Person, Enrollment, Attendance, Grade, Timetable, Classroom, Notification, AuditLog)] as repositories
     }
 }
 
 database "Persistence Tier (PostgreSQL 16 / Flyway Migrations)" {
     [Flyway Migration Engine] as flyway
-    [Relational Tables (3NF Schema)] as tables
+    [Core & Advanced Tables (3NF Schema)] as tables
 }
 
 ' Frontend Interconnections
@@ -83,14 +102,20 @@ router --> authGuard
 authGuard --> adminOverview
 authGuard --> facOverview
 authGuard --> stuOverview
+stuGradePage --> transcriptModal
 adminOverview --> apiClient
 facOverview --> apiClient
 stuOverview --> apiClient
+notifBell --> notifCtrl : Polling / WebSocket
 apiClient --> authCtrl : HTTP/JSON + Bearer JWT
 apiClient --> courseCtrl
 apiClient --> enrollCtrl
 apiClient --> attCtrl
 apiClient --> gradeCtrl
+apiClient --> ttCtrl
+apiClient --> analyticsCtrl
+apiClient --> auditCtrl
+apiClient --> transcriptCtrl
 apiClient --> annCtrl
 
 ' Backend Interconnections
@@ -102,6 +127,11 @@ stuCtrl --> stuSvc
 enrollCtrl --> enrollSvc
 attCtrl --> attSvc
 gradeCtrl --> gradeSvc
+ttCtrl --> ttSvc
+analyticsCtrl --> analyticsSvc
+auditCtrl --> auditSvc
+transcriptCtrl --> transcriptSvc
+notifCtrl --> notifSvc
 annCtrl --> annSvc
 
 jwtFilter --> jwtProvider
@@ -109,6 +139,17 @@ jwtFilter --> userDetails
 
 enrollSvc --> statePattern
 gradeSvc --> strategyPattern
+gradeSvc --> observerPattern
+attSvc --> observerPattern
+enrollSvc --> observerPattern
+observerPattern --> notifSvc
+transcriptSvc --> builderPattern
+
+stuSvc --> auditSvc
+courseSvc --> auditSvc
+gradeSvc --> auditSvc
+attSvc --> auditSvc
+enrollSvc --> auditSvc
 
 authSvc --> repositories
 deptSvc --> repositories
@@ -118,9 +159,13 @@ stuSvc --> repositories
 enrollSvc --> repositories
 attSvc --> repositories
 gradeSvc --> repositories
+ttSvc --> repositories
+analyticsSvc --> repositories
+auditSvc --> repositories
+notifSvc --> repositories
 annSvc --> repositories
 
 repositories --> tables : JDBC / Hibernate ORM
-flyway --> tables : V1__init_core_schema.sql
+flyway --> tables : V1__init_core_schema.sql\nV2__phase2_advanced_schema.sql
 
 @enduml

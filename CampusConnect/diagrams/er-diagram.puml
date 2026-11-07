@@ -1,5 +1,5 @@
 @startuml er-diagram
-title CampusConnect - Relational Database Schema (3NF)
+title CampusConnect - Relational Database Schema (3NF) - Phase 1 & Phase 2
 skinparam linetype ortho
 skinparam packageStyle rectangle
 
@@ -64,19 +64,53 @@ entity "courses" as courses {
     * credits : INT
     * semester : INT
     * capacity : INT
-    department_id : BIGINT <<FK to departments>>
-    faculty_id : BIGINT <<FK to faculty>>
+    * department_id : BIGINT <<FK to departments>>
+    instructor_id : BIGINT <<FK to faculty>>
     * created_at : TIMESTAMPTZ
 }
 
-entity "course_assessments" as course_assessments {
+entity "classrooms" as classrooms {
+    * id : BIGINT <<PK>>
+    --
+    * room_number : VARCHAR(50) <<UQ>>
+    * building : VARCHAR(100)
+    * capacity : INT
+    * room_type : VARCHAR(50)
+    * created_at : TIMESTAMPTZ
+}
+
+entity "timetables" as timetables {
     * id : BIGINT <<PK>>
     --
     * course_id : BIGINT <<FK to courses>>
-    * name : VARCHAR(100)
+    * classroom_id : BIGINT <<FK to classrooms>>
+    * faculty_id : BIGINT <<FK to faculty>>
+    * day_of_week : VARCHAR(20)
+    * start_time : TIME
+    * end_time : TIME
+    * created_at : TIMESTAMPTZ
+}
+
+entity "notifications" as notifications {
+    * id : BIGINT <<PK>>
+    --
+    * user_id : BIGINT <<FK to user_accounts>>
+    * title : VARCHAR(200)
+    * message : TEXT
     * type : VARCHAR(50)
-    * max_marks : NUMERIC(5,2)
-    * weightage_percentage : NUMERIC(5,2)
+    * is_read : BOOLEAN
+    * created_at : TIMESTAMPTZ
+}
+
+entity "audit_logs" as audit_logs {
+    * id : BIGINT <<PK>>
+    --
+    * action : VARCHAR(100)
+    * entity_name : VARCHAR(100)
+    entity_id : VARCHAR(50)
+    * performed_by_username : VARCHAR(100)
+    details : TEXT
+    ip_address : VARCHAR(50)
     * created_at : TIMESTAMPTZ
 }
 
@@ -85,11 +119,21 @@ entity "enrollments" as enrollments {
     --
     * student_id : BIGINT <<FK to students>>
     * course_id : BIGINT <<FK to courses>>
-    * semester : INT
     * status : VARCHAR(30)
-    * registered_at : TIMESTAMPTZ
+    * enrolled_at : TIMESTAMPTZ
     --
-    UQ: (student_id, course_id, semester)
+    UQ: (student_id, course_id)
+}
+
+entity "course_assessments" as course_assessments {
+    * id : BIGINT <<PK>>
+    --
+    * course_id : BIGINT <<FK to courses>>
+    * name : VARCHAR(100)
+    * assessment_type : VARCHAR(50)
+    * max_marks : NUMERIC(5,2)
+    * weightage : NUMERIC(5,2)
+    * created_at : TIMESTAMPTZ
 }
 
 entity "attendance_sessions" as attendance_sessions {
@@ -157,6 +201,12 @@ students ||--o{ attendance_records : "attendance of"
 
 enrollments ||--o{ grades : "evaluation"
 course_assessments ||--o{ grades : "component"
+
+courses ||--o{ timetables : "timetabled"
+classrooms ||--o{ timetables : "room allocation"
+faculty ||--o{ timetables : "teaching schedule"
+
+user_accounts ||--o{ notifications : "receives"
 
 courses ||--o{ announcements : "course broadcasts"
 persons ||--o{ announcements : "author"
