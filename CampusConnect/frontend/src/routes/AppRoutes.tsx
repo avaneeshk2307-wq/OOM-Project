@@ -15,7 +15,9 @@ import { StudentOverview } from '../pages/student/StudentOverview';
 import { StudentCatalog } from '../pages/student/StudentCatalog';
 import { StudentEnrollments } from '../pages/student/StudentEnrollments';
 import { AttendanceMarking } from '../pages/faculty/AttendanceMarking';
+import { GradeEntry } from '../pages/faculty/GradeEntry';
 import { StudentAttendance } from '../pages/student/StudentAttendance';
+import { StudentGrades } from '../pages/student/StudentGrades';
 import LandingPage from '../pages/LandingPage';
 
 export const AppRoutes: React.FC = () => {
@@ -45,7 +47,7 @@ export const AppRoutes: React.FC = () => {
           <Route index element={<FacultyOverview />} />
           <Route path="courses" element={<FacultyOverview />} />
           <Route path="attendance" element={<AttendanceMarking />} />
-          <Route path="grades" element={<FacultyOverview />} />
+          <Route path="grades" element={<GradeEntry />} />
           <Route path="announcements" element={<FacultyOverview />} />
         </Route>
       </Route>
@@ -57,7 +59,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="catalog" element={<StudentCatalog />} />
           <Route path="courses" element={<StudentEnrollments />} />
           <Route path="attendance" element={<StudentAttendance />} />
-          <Route path="grades" element={<StudentOverview />} />
+          <Route path="grades" element={<StudentGrades />} />
           <Route path="announcements" element={<StudentOverview />} />
         </Route>
       </Route>
