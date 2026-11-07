@@ -53,7 +53,8 @@ class DomainModelAndRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        csDept = departmentRepository.save(new Department("CS", "Computer Science", "Department of CS"));
+        csDept = departmentRepository.findByCode("CS")
+                .orElseGet(() -> departmentRepository.save(new Department("CS", "Computer Science", "Department of CS")));
     }
 
     @Test
