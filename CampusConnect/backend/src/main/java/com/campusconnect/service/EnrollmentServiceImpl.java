@@ -6,11 +6,13 @@ import com.campusconnect.entity.Course;
 import com.campusconnect.entity.Enrollment;
 import com.campusconnect.entity.Student;
 import com.campusconnect.enums.EnrollmentStatus;
+import com.campusconnect.event.EnrollmentApprovedEvent;
 import com.campusconnect.patterns.state.EnrollmentState;
 import com.campusconnect.patterns.state.EnrollmentStateFactory;
 import com.campusconnect.repository.CourseRepository;
 import com.campusconnect.repository.EnrollmentRepository;
 import com.campusconnect.repository.StudentRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,15 +30,18 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public EnrollmentServiceImpl(
             EnrollmentRepository enrollmentRepository,
             StudentRepository studentRepository,
-            CourseRepository courseRepository
+            CourseRepository courseRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.enrollmentRepository = enrollmentRepository;
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -79,6 +84,15 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         currentState.approve(enrollment);
 
         Enrollment updated = enrollmentRepository.save(enrollment);
+
+        // Notify Observers via Spring Event Publisher
+        eventPublisher.publishEvent(new EnrollmentApprovedEvent(
+                updated.getStudent().getId(),
+                updated.getCourse().getId(),
+                updated.getCourse().getCode(),
+                updated.getCourse().getTitle()
+        ));
+
         return mapToResponse(updated);
     }
 

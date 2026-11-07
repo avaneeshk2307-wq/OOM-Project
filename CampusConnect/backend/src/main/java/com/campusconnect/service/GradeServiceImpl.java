@@ -4,12 +4,14 @@ import com.campusconnect.dto.*;
 import com.campusconnect.entity.*;
 import com.campusconnect.enums.EnrollmentStatus;
 import com.campusconnect.exception.ResourceNotFoundException;
+import com.campusconnect.event.GradePublishedEvent;
 import com.campusconnect.patterns.strategy.GradingResult;
 import com.campusconnect.patterns.strategy.GradingStrategy;
 import com.campusconnect.patterns.strategy.GradingStrategyFactory;
 import com.campusconnect.patterns.strategy.RelativeGradingStrategy;
 import com.campusconnect.repository.*;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class GradeServiceImpl implements GradeService {
     private final GradingStrategy gradingStrategy;
     private final GradingStrategyFactory gradingStrategyFactory;
     private final RelativeGradingStrategy relativeGradingStrategy;
+    private final ApplicationEventPublisher eventPublisher;
 
     public GradeServiceImpl(
             GradeRepository gradeRepository,
@@ -39,7 +42,8 @@ public class GradeServiceImpl implements GradeService {
             StudentRepository studentRepository,
             @Qualifier("absoluteGradingStrategy") GradingStrategy gradingStrategy,
             GradingStrategyFactory gradingStrategyFactory,
-            RelativeGradingStrategy relativeGradingStrategy
+            RelativeGradingStrategy relativeGradingStrategy,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.gradeRepository = gradeRepository;
         this.assessmentComponentRepository = assessmentComponentRepository;
@@ -49,6 +53,7 @@ public class GradeServiceImpl implements GradeService {
         this.gradingStrategy = gradingStrategy;
         this.gradingStrategyFactory = gradingStrategyFactory;
         this.relativeGradingStrategy = relativeGradingStrategy;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -111,6 +116,18 @@ public class GradeServiceImpl implements GradeService {
         }
 
         Grade saved = gradeRepository.save(grade);
+
+        // Notify Observers via Spring Event Publisher
+        eventPublisher.publishEvent(new GradePublishedEvent(
+                enrollment.getStudent().getId(),
+                assessment.getCourse().getId(),
+                assessment.getCourse().getCode(),
+                assessment.getName(),
+                saved.getMarksObtained(),
+                assessment.getMaxMarks(),
+                saved.getLetterGrade()
+        ));
+
         return mapToGradeResponse(saved, result);
     }
 

@@ -4,8 +4,10 @@ import com.campusconnect.dto.*;
 import com.campusconnect.entity.*;
 import com.campusconnect.enums.AttendanceStatus;
 import com.campusconnect.enums.EnrollmentStatus;
+import com.campusconnect.event.AttendanceShortageEvent;
 import com.campusconnect.exception.ResourceNotFoundException;
 import com.campusconnect.repository.*;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,19 +24,22 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final CourseRepository courseRepository;
     private final StudentRepository studentRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public AttendanceServiceImpl(
             AttendanceSessionRepository attendanceSessionRepository,
             AttendanceRecordRepository attendanceRecordRepository,
             CourseRepository courseRepository,
             StudentRepository studentRepository,
-            EnrollmentRepository enrollmentRepository
+            EnrollmentRepository enrollmentRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.attendanceSessionRepository = attendanceSessionRepository;
         this.attendanceRecordRepository = attendanceRecordRepository;
         this.courseRepository = courseRepository;
         this.studentRepository = studentRepository;
         this.enrollmentRepository = enrollmentRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -53,6 +58,28 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
         AttendanceSession saved = attendanceSessionRepository.save(session);
+
+        // Check for attendance shortage and notify observers
+        if (request.records() != null && !request.records().isEmpty()) {
+            for (RecordEntryRequest rec : request.records()) {
+                long total = attendanceRecordRepository.countTotalByCourseAndStudent(session.getCourse().getId(), rec.studentId());
+                long attended = attendanceRecordRepository.countAttendedByCourseAndStudent(session.getCourse().getId(), rec.studentId());
+                if (total > 0) {
+                    double pct = Math.round(((double) attended / total) * 1000.0) / 10.0;
+                    if (pct < 75.0) {
+                        eventPublisher.publishEvent(new AttendanceShortageEvent(
+                                rec.studentId(),
+                                session.getCourse().getId(),
+                                session.getCourse().getCode(),
+                                attended,
+                                total,
+                                pct
+                        ));
+                    }
+                }
+            }
+        }
+
         return mapToSessionResponse(saved);
     }
 
@@ -68,6 +95,28 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
         AttendanceSession saved = attendanceSessionRepository.save(session);
+
+        // Check for attendance shortage and notify observers
+        if (records != null && !records.isEmpty()) {
+            for (RecordEntryRequest rec : records) {
+                long total = attendanceRecordRepository.countTotalByCourseAndStudent(session.getCourse().getId(), rec.studentId());
+                long attended = attendanceRecordRepository.countAttendedByCourseAndStudent(session.getCourse().getId(), rec.studentId());
+                if (total > 0) {
+                    double pct = Math.round(((double) attended / total) * 1000.0) / 10.0;
+                    if (pct < 75.0) {
+                        eventPublisher.publishEvent(new AttendanceShortageEvent(
+                                rec.studentId(),
+                                session.getCourse().getId(),
+                                session.getCourse().getCode(),
+                                attended,
+                                total,
+                                pct
+                        ));
+                    }
+                }
+            }
+        }
+
         return mapToSessionResponse(saved);
     }
 

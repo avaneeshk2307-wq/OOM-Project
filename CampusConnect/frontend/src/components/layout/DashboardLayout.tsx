@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { NotificationBell } from './NotificationBell';
 import { 
   GraduationCap, 
   LogOut, 
@@ -93,6 +94,8 @@ export const DashboardLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            <NotificationBell />
+
             <div className="hidden sm:flex flex-col text-right">
               <span className="text-sm font-medium text-white">{user?.fullName}</span>
               <span className="text-xs text-slate-400">
