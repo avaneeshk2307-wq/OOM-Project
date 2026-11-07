@@ -1,0 +1,234 @@
+@startuml class-diagram
+title CampusConnect - Domain Object Model & Design Patterns (Phase 1)
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.campusconnect.entity (Core Domain Model)" {
+
+    abstract class Person {
+        - Long id
+        - String name
+        - String email
+        - String phone
+        - AccountStatus accountStatus
+        - Instant createdAt
+        + getId(): Long
+        + getName(): String
+        + getEmail(): String
+        + getPhone(): String
+        + getAccountStatus(): AccountStatus
+        + updateContactInfo(String, String): void
+        + activate(): void
+        + deactivate(): void
+    }
+
+    class Student {
+        - String rollNumber
+        - int semester
+        + getRollNumber(): String
+        + getSemester(): int
+        + promoteToNextSemester(): void
+    }
+
+    class Faculty {
+        - String employeeCode
+        - String designation
+        + getEmployeeCode(): String
+        + getDesignation(): String
+    }
+
+    class Admin {
+        - String roleTitle
+        + getRoleTitle(): String
+    }
+
+    class Department {
+        - Long id
+        - String code
+        - String name
+        - String description
+        + getId(): Long
+        + getCode(): String
+        + getName(): String
+    }
+
+    class Course {
+        - Long id
+        - String code
+        - String title
+        - String description
+        - int credits
+        - int semester
+        - int capacity
+        + getId(): Long
+        + getCode(): String
+        + getTitle(): String
+        + getCredits(): int
+        + getCapacity(): int
+        + assignFaculty(Faculty): void
+        + addAssessmentComponent(AssessmentComponent): void
+    }
+
+    class AssessmentComponent {
+        - Long id
+        - String name
+        - AssessmentType type
+        - BigDecimal maxMarks
+        - BigDecimal weightagePercentage
+        + getId(): Long
+        + getName(): String
+        + getType(): AssessmentType
+        + getMaxMarks(): BigDecimal
+        + getWeightagePercentage(): BigDecimal
+    }
+
+    class Enrollment {
+        - Long id
+        - int semester
+        - EnrollmentStatus status
+        - Instant registeredAt
+        + getId(): Long
+        + getStatus(): EnrollmentStatus
+        + submit(): void
+        + approve(): void
+        + finalizeEnrollment(): void
+        + drop(): void
+        + reject(): void
+    }
+
+    class AttendanceSession {
+        - Long id
+        - LocalDate sessionDate
+        - String topic
+        - Instant createdAt
+        + getId(): Long
+        + getSessionDate(): LocalDate
+        + getTopic(): String
+        + recordStudentAttendance(Student, AttendanceStatus, String): AttendanceRecord
+        + getPresentCount(): long
+    }
+
+    class AttendanceRecord {
+        - Long id
+        - AttendanceStatus status
+        - String remarks
+        + getId(): Long
+        + getStatus(): AttendanceStatus
+        + getRemarks(): String
+        + updateStatus(AttendanceStatus, String): void
+    }
+
+    class Grade {
+        - Long id
+        - BigDecimal marksObtained
+        - String letterGrade
+        - Instant gradedAt
+        + getId(): Long
+        + getMarksObtained(): BigDecimal
+        + getLetterGrade(): String
+        + setMarks(BigDecimal, String): void
+    }
+
+    class UserAccount {
+        - Long id
+        - String username
+        - String passwordHash
+        - Role role
+        - boolean enabled
+        + getId(): Long
+        + getUsername(): String
+        + getRole(): Role
+        + isEnabled(): boolean
+    }
+
+    class Announcement {
+        - Long id
+        - String title
+        - String content
+        - Role targetRole
+        - Instant createdAt
+        + getId(): Long
+        + getTitle(): String
+        + getContent(): String
+        + getTargetRole(): Role
+    }
+}
+
+package "com.campusconnect.patterns.state (State Pattern)" {
+    interface EnrollmentState {
+        + submit(Enrollment): void
+        + approve(Enrollment): void
+        + finalizeEnrollment(Enrollment): void
+        + drop(Enrollment): void
+        + reject(Enrollment): void
+        + getStatus(): EnrollmentStatus
+    }
+
+    abstract class AbstractEnrollmentState implements EnrollmentState
+
+    class DraftState extends AbstractEnrollmentState
+    class SubmittedState extends AbstractEnrollmentState
+    class ApprovedState extends AbstractEnrollmentState
+    class EnrolledState extends AbstractEnrollmentState
+    class DroppedState extends AbstractEnrollmentState
+    class RejectedState extends AbstractEnrollmentState
+
+    class EnrollmentStateFactory {
+        + {static} getState(EnrollmentStatus): EnrollmentState
+    }
+}
+
+package "com.campusconnect.patterns.strategy (Strategy Pattern)" {
+    interface GradingStrategy {
+        + calculateGrade(BigDecimal, BigDecimal): GradingResult
+        + getStrategyName(): String
+    }
+
+    class AbsoluteGradingStrategy implements GradingStrategy {
+        + calculateGrade(BigDecimal, BigDecimal): GradingResult
+        + getStrategyName(): String
+    }
+
+    class GradingResult <<record>> {
+        + GradeLetter gradeLetter
+        + double gradePoint
+        + double percentage
+        + String remark
+    }
+}
+
+' Inheritance Hierarchies (Joined-table JPA)
+Person <|-- Student
+Person <|-- Faculty
+Person <|-- Admin
+
+' Aggregation: Department aggregates Students, Faculty, and Courses
+Department "1" o-- "0..*" Student : belongs to
+Department "1" o-- "0..*" Faculty : member of
+Department "1" o-- "0..*" Course : offers
+
+' Association: Faculty teaches Courses
+Faculty "1" <-- "0..*" Course : instructor
+UserAccount "1" *-- "1" Person : credentials adapter
+
+' Composition: Course owns AssessmentComponents (cascaded lifecycle)
+Course "1" *-- "0..*" AssessmentComponent : composed of
+
+' Association & State: Student enrolls in Course
+Student "1" <-- "0..*" Enrollment : student
+Course "1" <-- "0..*" Enrollment : course
+Enrollment ..> EnrollmentState : delegates transition to
+
+' Composition: AttendanceSession owns AttendanceRecords
+AttendanceSession "1" *-- "0..*" AttendanceRecord : composed of
+AttendanceSession "0..*" --> "1" Course : conducted for
+AttendanceRecord "0..*" --> "1" Student : recorded for
+
+' Association: Grade bridges Enrollment and AssessmentComponent
+Enrollment "1" <-- "0..*" Grade : graded for
+AssessmentComponent "1" <-- "0..*" Grade : evaluated by
+Grade ..> GradingStrategy : evaluated using
+
+@enduml

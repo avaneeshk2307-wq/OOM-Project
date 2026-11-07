@@ -1,0 +1,42 @@
+@startuml deployment-diagram
+title CampusConnect - Deployment Infrastructure Diagram
+skinparam node {
+    borderColor #3F51B5
+    backgroundColor #E8EAF6
+}
+
+node "Client Device" as client {
+    node "Modern Web Browser\n(Chrome, Firefox, Safari, Edge)" as browser {
+        artifact "Single Page Application (SPA)\nReact 18 + Vite Bundles\nHTML5 / CSS3 / JavaScript (ES2022)" as spaArtifact
+    }
+}
+
+node "Application Host / Local Server" as appHost {
+    node "Frontend Web Server\n(Vite Dev Server / Nginx)" as webServer {
+        portin "Port 5173" as webPort
+        component "Static Asset Handler\nReverse Proxy (/api/v1)" as proxy
+    }
+
+    node "Java Virtual Machine (JVM 21+)" as jvm {
+        node "Embedded Apache Tomcat 10.1" as tomcat {
+            portin "Port 8080" as apiPort
+            artifact "campusconnect-backend.jar\nSpring Boot 3.3.5" as backendJar
+        }
+    }
+}
+
+node "Database Host / Docker Container" as dbHost {
+    node "PostgreSQL 16 Engine" as pgEngine {
+        portin "Port 5432" as dbPort
+        database "campusconnect DB" as dbInstance {
+            component "Core Relational Tables\nFlyway Migration V1" as schema
+        }
+    }
+}
+
+' Communication paths
+browser -- webPort : HTTPS / HTTP
+proxy -- apiPort : Forwarded REST / JSON
+backendJar -- dbPort : JDBC (HikariCP Connection Pool)
+
+@enduml

@@ -1,0 +1,164 @@
+@startuml er-diagram
+title CampusConnect - Relational Database Schema (3NF)
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+entity "departments" as departments {
+    * id : BIGINT <<PK>>
+    --
+    * code : VARCHAR(20) <<UQ>>
+    * name : VARCHAR(100)
+    description : TEXT
+    * created_at : TIMESTAMPTZ
+}
+
+entity "persons" as persons {
+    * id : BIGINT <<PK>>
+    --
+    * name : VARCHAR(150)
+    * email : VARCHAR(150) <<UQ>>
+    phone : VARCHAR(30)
+    * account_status : VARCHAR(30)
+    * created_at : TIMESTAMPTZ
+}
+
+entity "students" as students {
+    * id : BIGINT <<PK, FK to persons>>
+    --
+    * roll_number : VARCHAR(50) <<UQ>>
+    * semester : INT
+    department_id : BIGINT <<FK to departments>>
+}
+
+entity "faculty" as faculty {
+    * id : BIGINT <<PK, FK to persons>>
+    --
+    * employee_code : VARCHAR(50) <<UQ>>
+    * designation : VARCHAR(100)
+    department_id : BIGINT <<FK to departments>>
+}
+
+entity "admins" as admins {
+    * id : BIGINT <<PK, FK to persons>>
+    --
+    * role_title : VARCHAR(100)
+}
+
+entity "user_accounts" as user_accounts {
+    * id : BIGINT <<PK>>
+    --
+    * person_id : BIGINT <<FK to persons, UQ>>
+    * username : VARCHAR(100) <<UQ>>
+    * password_hash : VARCHAR(255)
+    * role : VARCHAR(50)
+    * enabled : BOOLEAN
+    * created_at : TIMESTAMPTZ
+}
+
+entity "courses" as courses {
+    * id : BIGINT <<PK>>
+    --
+    * code : VARCHAR(30) <<UQ>>
+    * title : VARCHAR(150)
+    description : TEXT
+    * credits : INT
+    * semester : INT
+    * capacity : INT
+    department_id : BIGINT <<FK to departments>>
+    faculty_id : BIGINT <<FK to faculty>>
+    * created_at : TIMESTAMPTZ
+}
+
+entity "course_assessments" as course_assessments {
+    * id : BIGINT <<PK>>
+    --
+    * course_id : BIGINT <<FK to courses>>
+    * name : VARCHAR(100)
+    * type : VARCHAR(50)
+    * max_marks : NUMERIC(5,2)
+    * weightage_percentage : NUMERIC(5,2)
+    * created_at : TIMESTAMPTZ
+}
+
+entity "enrollments" as enrollments {
+    * id : BIGINT <<PK>>
+    --
+    * student_id : BIGINT <<FK to students>>
+    * course_id : BIGINT <<FK to courses>>
+    * semester : INT
+    * status : VARCHAR(30)
+    * registered_at : TIMESTAMPTZ
+    --
+    UQ: (student_id, course_id, semester)
+}
+
+entity "attendance_sessions" as attendance_sessions {
+    * id : BIGINT <<PK>>
+    --
+    * course_id : BIGINT <<FK to courses>>
+    * session_date : DATE
+    topic : VARCHAR(200)
+    * created_at : TIMESTAMPTZ
+}
+
+entity "attendance_records" as attendance_records {
+    * id : BIGINT <<PK>>
+    --
+    * session_id : BIGINT <<FK to attendance_sessions>>
+    * student_id : BIGINT <<FK to students>>
+    * status : VARCHAR(30)
+    remarks : VARCHAR(255)
+    --
+    UQ: (session_id, student_id)
+}
+
+entity "grades" as grades {
+    * id : BIGINT <<PK>>
+    --
+    * enrollment_id : BIGINT <<FK to enrollments>>
+    * assessment_id : BIGINT <<FK to course_assessments>>
+    * marks_obtained : NUMERIC(5,2)
+    letter_grade : VARCHAR(10)
+    * graded_at : TIMESTAMPTZ
+    --
+    UQ: (enrollment_id, assessment_id)
+}
+
+entity "announcements" as announcements {
+    * id : BIGINT <<PK>>
+    --
+    * title : VARCHAR(200)
+    * content : TEXT
+    target_role : VARCHAR(50)
+    course_id : BIGINT <<FK to courses>>
+    author_id : BIGINT <<FK to persons>>
+    * created_at : TIMESTAMPTZ
+}
+
+' Relationships
+persons ||--o| students : "JOINED table inheritance"
+persons ||--o| faculty : "JOINED table inheritance"
+persons ||--o| admins : "JOINED table inheritance"
+persons ||--o| user_accounts : "1:1 credentials"
+
+departments ||--o{ students : "enrolled in"
+departments ||--o{ faculty : "affiliated with"
+departments ||--o{ courses : "offers"
+
+faculty ||--o{ courses : "teaches"
+courses ||--|{ course_assessments : "owns (composition)"
+
+students ||--o{ enrollments : "registers"
+courses ||--o{ enrollments : "roster"
+
+courses ||--o{ attendance_sessions : "holds"
+attendance_sessions ||--|{ attendance_records : "owns (composition)"
+students ||--o{ attendance_records : "attendance of"
+
+enrollments ||--o{ grades : "evaluation"
+course_assessments ||--o{ grades : "component"
+
+courses ||--o{ announcements : "course broadcasts"
+persons ||--o{ announcements : "author"
+
+@enduml

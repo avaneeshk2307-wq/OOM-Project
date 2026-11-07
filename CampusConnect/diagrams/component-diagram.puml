@@ -1,0 +1,126 @@
+@startuml component-diagram
+title CampusConnect - Architectural Component Diagram (Phase 1)
+skinparam componentStyle uml2
+
+package "Frontend Tier (React 18 + Vite + TypeScript + Tailwind CSS)" {
+    [AppRoutes / Router] as router
+    [AuthContext & RoleGuard] as authGuard
+    [Axios API Client] as apiClient
+
+    package "Admin UI Pages" {
+        [AdminOverview] as adminOverview
+        [DepartmentManagement] as deptPage
+        [CourseManagement] as coursePage
+        [FacultyManagement] as facPage
+        [StudentManagement] as stuPage
+        [AdminEnrollmentManagement] as adminEnrollPage
+        [AdminAnnouncements] as adminAnnPage
+    }
+
+    package "Faculty UI Pages" {
+        [FacultyOverview] as facOverview
+        [AttendanceMarking] as attMarkingPage
+        [GradeEntry] as gradeEntryPage
+    }
+
+    package "Student UI Pages" {
+        [StudentOverview] as stuOverview
+        [StudentCatalog] as stuCatalogPage
+        [StudentEnrollments] as stuEnrollPage
+        [StudentAttendance] as stuAttPage
+        [StudentGrades] as stuGradePage
+    }
+}
+
+package "Backend Tier (Spring Boot 3 + Java 21+ Clean Architecture)" {
+    package "REST Controllers" {
+        [AuthController] as authCtrl
+        [AdminDepartmentController] as deptCtrl
+        [AdminCourseController] as courseCtrl
+        [AdminFacultyController] as facCtrl
+        [AdminStudentController] as stuCtrl
+        [EnrollmentController] as enrollCtrl
+        [AttendanceController] as attCtrl
+        [GradeController] as gradeCtrl
+        [AnnouncementController] as annCtrl
+    }
+
+    package "Security Layer" {
+        [JwtAuthenticationFilter] as jwtFilter
+        [JwtTokenProvider] as jwtProvider
+        [UserDetailsServiceImpl] as userDetails
+    }
+
+    package "Service Layer" {
+        [AuthService] as authSvc
+        [DepartmentService] as deptSvc
+        [CourseService] as courseSvc
+        [FacultyService] as facSvc
+        [StudentService] as stuSvc
+        [EnrollmentService] as enrollSvc
+        [AttendanceService] as attSvc
+        [GradeService] as gradeSvc
+        [AnnouncementService] as annSvc
+    }
+
+    package "Design Pattern Engines" {
+        [GoF State Pattern\n(EnrollmentState & Factory)] as statePattern
+        [GoF Strategy Pattern\n(GradingStrategy & AbsoluteGrading)] as strategyPattern
+    }
+
+    package "Data Access (Spring Data JPA)" {
+        [JPA Repositories\n(Department, Course, Person, Enrollment, Attendance, Grade)] as repositories
+    }
+}
+
+database "Persistence Tier (PostgreSQL 16 / Flyway Migrations)" {
+    [Flyway Migration Engine] as flyway
+    [Relational Tables (3NF Schema)] as tables
+}
+
+' Frontend Interconnections
+router --> authGuard
+authGuard --> adminOverview
+authGuard --> facOverview
+authGuard --> stuOverview
+adminOverview --> apiClient
+facOverview --> apiClient
+stuOverview --> apiClient
+apiClient --> authCtrl : HTTP/JSON + Bearer JWT
+apiClient --> courseCtrl
+apiClient --> enrollCtrl
+apiClient --> attCtrl
+apiClient --> gradeCtrl
+apiClient --> annCtrl
+
+' Backend Interconnections
+authCtrl --> authSvc
+deptCtrl --> deptSvc
+courseCtrl --> courseSvc
+facCtrl --> facSvc
+stuCtrl --> stuSvc
+enrollCtrl --> enrollSvc
+attCtrl --> attSvc
+gradeCtrl --> gradeSvc
+annCtrl --> annSvc
+
+jwtFilter --> jwtProvider
+jwtFilter --> userDetails
+
+enrollSvc --> statePattern
+gradeSvc --> strategyPattern
+
+authSvc --> repositories
+deptSvc --> repositories
+courseSvc --> repositories
+facSvc --> repositories
+stuSvc --> repositories
+enrollSvc --> repositories
+attSvc --> repositories
+gradeSvc --> repositories
+annSvc --> repositories
+
+repositories --> tables : JDBC / Hibernate ORM
+flyway --> tables : V1__init_core_schema.sql
+
+@enduml

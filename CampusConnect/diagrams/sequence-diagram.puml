@@ -1,0 +1,80 @@
+@startuml sequence-diagram
+title CampusConnect - Course Registration & State Pattern Lifecycle Sequence
+autonumber
+skinparam responseMessageBelowArrow true
+
+actor "Student" as student
+boundary "React UI\n(StudentCatalog)" as ui
+control "EnrollmentController" as controller
+participant "EnrollmentServiceImpl" as service
+participant "CourseRepository" as courseRepo
+participant "EnrollmentRepository" as enrollRepo
+entity "Enrollment" as enrollment
+participant "EnrollmentStateFactory" as stateFactory
+participant "DraftState" as draftState
+participant "SubmittedState" as submittedState
+database "PostgreSQL DB" as db
+
+student -> ui : Click "Register Course (CS101)"
+activate ui
+
+ui -> controller : POST /api/v1/enrollments/register\n{courseId: 10, semester: 3}
+activate controller
+
+controller -> service : registerCourse(studentId, request)
+activate service
+
+service -> courseRepo : findById(courseId)
+activate courseRepo
+courseRepo --> service : course (capacity=60)
+deactivate courseRepo
+
+service -> enrollRepo : existsByStudentIdAndCourseIdAndStatusNot(studentId, courseId, DROPPED)
+activate enrollRepo
+enrollRepo --> service : false (No duplicate active registration)
+deactivate enrollRepo
+
+service -> enrollRepo : countByCourseIdAndStatus(courseId, ENROLLED)
+activate enrollRepo
+enrollRepo --> service : 42 (Within course capacity limit)
+deactivate enrollRepo
+
+create enrollment
+service -> enrollment : new Enrollment(student, course, 3)
+activate enrollment
+enrollment --> service : enrollment (status=DRAFT)
+deactivate enrollment
+
+service -> stateFactory : getState(DRAFT)
+activate stateFactory
+stateFactory --> service : draftState
+deactivate stateFactory
+
+service -> draftState : submit(enrollment)
+activate draftState
+draftState -> enrollment : transitionTo(SUBMITTED)
+activate enrollment
+enrollment --> draftState : updated
+deactivate enrollment
+draftState --> service : void
+deactivate draftState
+
+service -> enrollRepo : save(enrollment)
+activate enrollRepo
+enrollRepo -> db : INSERT INTO enrollments (..., status='SUBMITTED')
+activate db
+db --> enrollRepo : saved record (id=101)
+deactivate db
+enrollRepo --> service : savedEnrollment
+deactivate enrollRepo
+
+service --> controller : EnrollmentResponse (status=SUBMITTED)
+deactivate service
+
+controller --> ui : HTTP 201 Created {status: "SUBMITTED"}
+deactivate controller
+
+ui --> student : Display "Application Submitted (Pending Approval)"
+deactivate ui
+
+@enduml

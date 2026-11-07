@@ -1,0 +1,105 @@
+@startuml use-case-diagram
+title CampusConnect - Phase 1 Use Case Diagram
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Student" as student
+actor "Faculty" as faculty
+actor "Administrator" as admin
+
+rectangle "CampusConnect Core System (Phase 1)" {
+
+    package "Identity & Access" {
+        usecase "Authenticate (Login)" as UC_Login
+        usecase "View Profile" as UC_Profile
+        usecase "Logout" as UC_Logout
+    }
+
+    package "Academic Administration" {
+        usecase "Manage Departments" as UC_Dept
+        usecase "Manage Courses & Capacities" as UC_Courses
+        usecase "Assign Faculty to Course" as UC_AssignFac
+        usecase "Manage Faculty Profiles" as UC_FacMgmt
+        usecase "Manage Student Profiles" as UC_StuMgmt
+        usecase "Promote Student Semester" as UC_Promote
+        usecase "View Campus KPI Dashboard" as UC_AdminKPI
+    }
+
+    package "Course Enrollment Lifecycle (State Pattern)" {
+        usecase "Browse Course Catalog" as UC_Catalog
+        usecase "Apply for Course Enrollment" as UC_EnrollApply
+        usecase "View Personal Enrollments" as UC_MyCourses
+        usecase "Review Enrollment Queue" as UC_ReviewEnroll
+        usecase "Approve Enrollment" as UC_ApproveEnroll
+        usecase "Finalize to Enrolled" as UC_FinalizeEnroll
+        usecase "Drop / Reject Enrollment" as UC_DropEnroll
+    }
+
+    package "Attendance Management (Composition)" {
+        usecase "Schedule Class Meeting" as UC_CreateSession
+        usecase "Mark Student Roster Attendance" as UC_MarkAttendance
+        usecase "View Course Attendance History" as UC_CourseAttHistory
+        usecase "View Personal Attendance Summary" as UC_MyAttendance
+        usecase "Receive <75% Shortage Alert" as UC_ShortageAlert
+    }
+
+    package "Grading & Evaluation (Strategy Pattern)" {
+        usecase "Define Course Assessment Component" as UC_CreateAssessment
+        usecase "Enter Marks for Students" as UC_EnterMarks
+        usecase "Calculate Letter Grade & Grade Points" as UC_CalcGrades
+        usecase "View Semester Transcript & CGPA" as UC_ViewGrades
+    }
+
+    package "Campus Announcements" {
+        usecase "Broadcast Announcement" as UC_CreateAnnounce
+        usecase "View Filtered Role Notices" as UC_ViewAnnounce
+        usecase "Delete Announcement" as UC_DeleteAnnounce
+    }
+}
+
+' Student Relationships
+student --> UC_Login
+student --> UC_Profile
+student --> UC_Logout
+student --> UC_Catalog
+student --> UC_EnrollApply
+student --> UC_MyCourses
+student --> UC_DropEnroll
+student --> UC_MyAttendance
+student --> UC_ViewGrades
+student --> UC_ViewAnnounce
+
+UC_MyAttendance ..> UC_ShortageAlert : <<include>>
+
+' Faculty Relationships
+faculty --> UC_Login
+faculty --> UC_Profile
+faculty --> UC_Logout
+faculty --> UC_CreateSession
+faculty --> UC_MarkAttendance
+faculty --> UC_CourseAttHistory
+faculty --> UC_CreateAssessment
+faculty --> UC_EnterMarks
+faculty --> UC_ViewAnnounce
+
+UC_EnterMarks ..> UC_CalcGrades : <<include>>
+
+' Administrator Relationships
+admin --> UC_Login
+admin --> UC_Profile
+admin --> UC_Logout
+admin --> UC_Dept
+admin --> UC_Courses
+admin --> UC_AssignFac
+admin --> UC_FacMgmt
+admin --> UC_StuMgmt
+admin --> UC_Promote
+admin --> UC_AdminKPI
+admin --> UC_ReviewEnroll
+admin --> UC_ApproveEnroll
+admin --> UC_FinalizeEnroll
+admin --> UC_DropEnroll
+admin --> UC_CreateAnnounce
+admin --> UC_DeleteAnnounce
+
+@enduml
