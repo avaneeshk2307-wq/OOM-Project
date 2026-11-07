@@ -9,8 +9,11 @@ import { DepartmentManagement } from '../pages/admin/DepartmentManagement';
 import { CourseManagement } from '../pages/admin/CourseManagement';
 import { FacultyManagement } from '../pages/admin/FacultyManagement';
 import { StudentManagement } from '../pages/admin/StudentManagement';
+import { AdminEnrollmentManagement } from '../pages/admin/AdminEnrollmentManagement';
 import { FacultyOverview } from '../pages/faculty/FacultyOverview';
 import { StudentOverview } from '../pages/student/StudentOverview';
+import { StudentCatalog } from '../pages/student/StudentCatalog';
+import { StudentEnrollments } from '../pages/student/StudentEnrollments';
 import LandingPage from '../pages/LandingPage';
 
 export const AppRoutes: React.FC = () => {
@@ -29,7 +32,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="courses" element={<CourseManagement />} />
           <Route path="faculty" element={<FacultyManagement />} />
           <Route path="students" element={<StudentManagement />} />
-          <Route path="enrollments" element={<AdminOverview />} />
+          <Route path="enrollments" element={<AdminEnrollmentManagement />} />
           <Route path="announcements" element={<AdminOverview />} />
         </Route>
       </Route>
@@ -49,8 +52,8 @@ export const AppRoutes: React.FC = () => {
       <Route element={<RoleGuard allowedRoles={['ROLE_ADMIN', 'ROLE_STUDENT']} />}>
         <Route path="/student" element={<DashboardLayout />}>
           <Route index element={<StudentOverview />} />
-          <Route path="catalog" element={<StudentOverview />} />
-          <Route path="courses" element={<StudentOverview />} />
+          <Route path="catalog" element={<StudentCatalog />} />
+          <Route path="courses" element={<StudentEnrollments />} />
           <Route path="attendance" element={<StudentOverview />} />
           <Route path="grades" element={<StudentOverview />} />
           <Route path="announcements" element={<StudentOverview />} />
