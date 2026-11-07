@@ -1,0 +1,35 @@
+# Operating System
+.DS_Store
+Thumbs.db
+
+# IDE & Editors
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Java / Maven
+CampusConnect/backend/target/
+CampusConnect/backend/.flattened-pom.xml
+*.class
+*.log
+
+# Node / Frontend
+CampusConnect/frontend/node_modules/
+CampusConnect/frontend/dist/
+CampusConnect/frontend/.vite/
+CampusConnect/frontend/coverage/
+
+# Environment files
+.env
+.env.local
+*.local
+
+# Reports & binaries
+*.pdf
+*.zip
+!CampusConnect/diagrams/*.puml
