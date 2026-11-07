@@ -45,6 +45,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(TimetableConflictException.class)
+    public ResponseEntity<Map<String, Object>> handleTimetableConflict(TimetableConflictException ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();

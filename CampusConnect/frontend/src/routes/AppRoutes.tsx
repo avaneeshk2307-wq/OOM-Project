@@ -19,6 +19,9 @@ import { AttendanceMarking } from '../pages/faculty/AttendanceMarking';
 import { GradeEntry } from '../pages/faculty/GradeEntry';
 import { StudentAttendance } from '../pages/student/StudentAttendance';
 import { StudentGrades } from '../pages/student/StudentGrades';
+import { AdminTimetable } from '../pages/admin/AdminTimetable';
+import { FacultyTimetable } from '../pages/faculty/FacultyTimetable';
+import { StudentTimetable } from '../pages/student/StudentTimetable';
 import LandingPage from '../pages/LandingPage';
 
 export const AppRoutes: React.FC = () => {
@@ -38,6 +41,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="faculty" element={<FacultyManagement />} />
           <Route path="students" element={<StudentManagement />} />
           <Route path="enrollments" element={<AdminEnrollmentManagement />} />
+          <Route path="timetable" element={<AdminTimetable />} />
           <Route path="announcements" element={<AdminAnnouncements />} />
         </Route>
       </Route>
@@ -47,6 +51,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/faculty" element={<DashboardLayout />}>
           <Route index element={<FacultyOverview />} />
           <Route path="courses" element={<FacultyOverview />} />
+          <Route path="timetable" element={<FacultyTimetable />} />
           <Route path="attendance" element={<AttendanceMarking />} />
           <Route path="grades" element={<GradeEntry />} />
           <Route path="announcements" element={<FacultyOverview />} />
@@ -57,6 +62,7 @@ export const AppRoutes: React.FC = () => {
       <Route element={<RoleGuard allowedRoles={['ROLE_ADMIN', 'ROLE_STUDENT']} />}>
         <Route path="/student" element={<DashboardLayout />}>
           <Route index element={<StudentOverview />} />
+          <Route path="timetable" element={<StudentTimetable />} />
           <Route path="catalog" element={<StudentCatalog />} />
           <Route path="courses" element={<StudentEnrollments />} />
           <Route path="attendance" element={<StudentAttendance />} />

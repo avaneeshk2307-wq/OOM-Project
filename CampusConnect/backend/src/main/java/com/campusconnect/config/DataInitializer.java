@@ -3,6 +3,7 @@ package com.campusconnect.config;
 import com.campusconnect.entity.*;
 import com.campusconnect.enums.AssessmentType;
 import com.campusconnect.enums.Role;
+import com.campusconnect.enums.RoomType;
 import com.campusconnect.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 
 /**
  * DataInitializer - Seeds initial university departments, demo accounts, and curriculum
@@ -30,6 +33,8 @@ public class DataInitializer implements CommandLineRunner {
     private final StudentRepository studentRepository;
     private final UserAccountRepository userAccountRepository;
     private final CourseRepository courseRepository;
+    private final ClassroomRepository classroomRepository;
+    private final TimetableRepository timetableRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(
@@ -39,6 +44,8 @@ public class DataInitializer implements CommandLineRunner {
             StudentRepository studentRepository,
             UserAccountRepository userAccountRepository,
             CourseRepository courseRepository,
+            ClassroomRepository classroomRepository,
+            TimetableRepository timetableRepository,
             PasswordEncoder passwordEncoder
     ) {
         this.departmentRepository = departmentRepository;
@@ -47,6 +54,8 @@ public class DataInitializer implements CommandLineRunner {
         this.studentRepository = studentRepository;
         this.userAccountRepository = userAccountRepository;
         this.courseRepository = courseRepository;
+        this.classroomRepository = classroomRepository;
+        this.timetableRepository = timetableRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -156,6 +165,30 @@ public class DataInitializer implements CommandLineRunner {
 
         courseRepository.save(oopCourse);
 
-        log.info("Database seeding completed successfully.");
+        // 6. Classrooms & Timetable Slots
+        Classroom lh101 = classroomRepository.save(new Classroom("LH-101", "Turing Science Complex", 60, RoomType.LECTURE_HALL));
+        Classroom lab201 = classroomRepository.save(new Classroom("LAB-201", "Ada Lovelace Computing Wing", 40, RoomType.LABORATORY));
+        classroomRepository.save(new Classroom("SEM-301", "von Neumann Hall", 50, RoomType.SEMINAR_ROOM));
+
+        // Seed initial lecture sessions for CS101
+        timetableRepository.save(new TimetableEntry(
+                oopCourse,
+                lh101,
+                faculty,
+                DayOfWeek.MONDAY,
+                LocalTime.of(9, 0),
+                LocalTime.of(10, 30)
+        ));
+
+        timetableRepository.save(new TimetableEntry(
+                oopCourse,
+                lab201,
+                faculty,
+                DayOfWeek.WEDNESDAY,
+                LocalTime.of(11, 0),
+                LocalTime.of(12, 30)
+        ));
+
+        log.info("Database seeding completed successfully with Phase 2 Timetables & Classrooms.");
     }
 }

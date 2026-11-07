@@ -11,7 +11,8 @@ import {
   Award, 
   Bell, 
   LayoutDashboard,
-  Briefcase
+  Briefcase,
+  Calendar
 } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
@@ -34,12 +35,14 @@ export const DashboardLayout: React.FC = () => {
           { name: 'Departments', path: '/admin/departments', icon: Building2 },
           { name: 'Courses', path: '/admin/courses', icon: BookOpen },
           { name: 'Enrollments', path: '/admin/enrollments', icon: Award },
+          { name: 'Timetable', path: '/admin/timetable', icon: Calendar },
           { name: 'Announcements', path: '/admin/announcements', icon: Bell },
         ];
       case 'ROLE_FACULTY':
         return [
           { name: 'Overview', path: '/faculty', icon: LayoutDashboard },
           { name: 'Assigned Courses', path: '/faculty/courses', icon: BookOpen },
+          { name: 'My Schedule', path: '/faculty/timetable', icon: Calendar },
           { name: 'Mark Attendance', path: '/faculty/attendance', icon: CalendarCheck },
           { name: 'Enter Grades', path: '/faculty/grades', icon: Award },
           { name: 'Announcements', path: '/faculty/announcements', icon: Bell },
@@ -47,6 +50,7 @@ export const DashboardLayout: React.FC = () => {
       case 'ROLE_STUDENT':
         return [
           { name: 'Overview', path: '/student', icon: LayoutDashboard },
+          { name: 'Class Schedule', path: '/student/timetable', icon: Calendar },
           { name: 'Course Catalog', path: '/student/catalog', icon: BookOpen },
           { name: 'My Enrollments', path: '/student/courses', icon: Award },
           { name: 'Attendance Record', path: '/student/attendance', icon: CalendarCheck },
