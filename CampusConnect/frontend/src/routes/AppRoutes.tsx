@@ -5,6 +5,10 @@ import { UnauthorizedPage } from '../pages/auth/UnauthorizedPage';
 import { RoleGuard } from '../components/layout/RoleGuard';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { AdminOverview } from '../pages/admin/AdminOverview';
+import { DepartmentManagement } from '../pages/admin/DepartmentManagement';
+import { CourseManagement } from '../pages/admin/CourseManagement';
+import { FacultyManagement } from '../pages/admin/FacultyManagement';
+import { StudentManagement } from '../pages/admin/StudentManagement';
 import { FacultyOverview } from '../pages/faculty/FacultyOverview';
 import { StudentOverview } from '../pages/student/StudentOverview';
 import LandingPage from '../pages/LandingPage';
@@ -21,10 +25,10 @@ export const AppRoutes: React.FC = () => {
       <Route element={<RoleGuard allowedRoles={['ROLE_ADMIN']} />}>
         <Route path="/admin" element={<DashboardLayout />}>
           <Route index element={<AdminOverview />} />
-          <Route path="students" element={<AdminOverview />} />
-          <Route path="faculty" element={<AdminOverview />} />
-          <Route path="departments" element={<AdminOverview />} />
-          <Route path="courses" element={<AdminOverview />} />
+          <Route path="departments" element={<DepartmentManagement />} />
+          <Route path="courses" element={<CourseManagement />} />
+          <Route path="faculty" element={<FacultyManagement />} />
+          <Route path="students" element={<StudentManagement />} />
           <Route path="enrollments" element={<AdminOverview />} />
           <Route path="announcements" element={<AdminOverview />} />
         </Route>
