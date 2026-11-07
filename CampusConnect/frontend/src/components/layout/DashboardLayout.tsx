@@ -14,7 +14,8 @@ import {
   LayoutDashboard,
   Briefcase,
   Calendar,
-  BarChart3
+  BarChart3,
+  ShieldCheck
 } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
@@ -39,6 +40,7 @@ export const DashboardLayout: React.FC = () => {
           { name: 'Enrollments', path: '/admin/enrollments', icon: Award },
           { name: 'Timetable', path: '/admin/timetable', icon: Calendar },
           { name: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
+          { name: 'Audit Logs', path: '/admin/audit-logs', icon: ShieldCheck },
           { name: 'Announcements', path: '/admin/announcements', icon: Bell },
         ];
       case 'ROLE_FACULTY':

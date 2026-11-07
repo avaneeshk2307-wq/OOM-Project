@@ -5,6 +5,7 @@ import com.campusconnect.dto.EnrollmentResponse;
 import com.campusconnect.entity.Course;
 import com.campusconnect.entity.Enrollment;
 import com.campusconnect.entity.Student;
+import com.campusconnect.enums.AuditAction;
 import com.campusconnect.enums.EnrollmentStatus;
 import com.campusconnect.event.EnrollmentApprovedEvent;
 import com.campusconnect.patterns.state.EnrollmentState;
@@ -31,17 +32,20 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final AuditLogService auditLogService;
 
     public EnrollmentServiceImpl(
             EnrollmentRepository enrollmentRepository,
             StudentRepository studentRepository,
             CourseRepository courseRepository,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            AuditLogService auditLogService
     ) {
         this.enrollmentRepository = enrollmentRepository;
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
         this.eventPublisher = eventPublisher;
+        this.auditLogService = auditLogService;
     }
 
     @Override
@@ -93,6 +97,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 updated.getCourse().getTitle()
         ));
 
+        auditLogService.recordLog(
+                AuditAction.ENROLLMENT_STATUS_CHANGE,
+                "Enrollment",
+                updated.getId().toString(),
+                "Approved enrollment for student " + updated.getStudent().getRollNumber() + " in course " + updated.getCourse().getCode()
+        );
+
         return mapToResponse(updated);
     }
 
@@ -111,6 +122,12 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         currentState.finalizeEnrollment(enrollment);
 
         Enrollment updated = enrollmentRepository.save(enrollment);
+        auditLogService.recordLog(
+                AuditAction.ENROLLMENT_STATUS_CHANGE,
+                "Enrollment",
+                updated.getId().toString(),
+                "Finalized enrollment for student " + updated.getStudent().getRollNumber() + " in course " + updated.getCourse().getCode()
+        );
         return mapToResponse(updated);
     }
 
@@ -123,6 +140,12 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         currentState.drop(enrollment);
 
         Enrollment updated = enrollmentRepository.save(enrollment);
+        auditLogService.recordLog(
+                AuditAction.ENROLLMENT_STATUS_CHANGE,
+                "Enrollment",
+                updated.getId().toString(),
+                "Dropped enrollment for student " + updated.getStudent().getRollNumber() + " in course " + updated.getCourse().getCode()
+        );
         return mapToResponse(updated);
     }
 
@@ -135,6 +158,12 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         currentState.reject(enrollment);
 
         Enrollment updated = enrollmentRepository.save(enrollment);
+        auditLogService.recordLog(
+                AuditAction.ENROLLMENT_STATUS_CHANGE,
+                "Enrollment",
+                updated.getId().toString(),
+                "Rejected enrollment for student " + updated.getStudent().getRollNumber() + " in course " + updated.getCourse().getCode()
+        );
         return mapToResponse(updated);
     }
 

@@ -3,6 +3,7 @@ package com.campusconnect.service;
 import com.campusconnect.dto.*;
 import com.campusconnect.entity.*;
 import com.campusconnect.enums.AttendanceStatus;
+import com.campusconnect.enums.AuditAction;
 import com.campusconnect.enums.EnrollmentStatus;
 import com.campusconnect.event.AttendanceShortageEvent;
 import com.campusconnect.exception.ResourceNotFoundException;
@@ -25,6 +26,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final StudentRepository studentRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final AuditLogService auditLogService;
 
     public AttendanceServiceImpl(
             AttendanceSessionRepository attendanceSessionRepository,
@@ -32,7 +34,8 @@ public class AttendanceServiceImpl implements AttendanceService {
             CourseRepository courseRepository,
             StudentRepository studentRepository,
             EnrollmentRepository enrollmentRepository,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            AuditLogService auditLogService
     ) {
         this.attendanceSessionRepository = attendanceSessionRepository;
         this.attendanceRecordRepository = attendanceRecordRepository;
@@ -40,6 +43,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         this.studentRepository = studentRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.eventPublisher = eventPublisher;
+        this.auditLogService = auditLogService;
     }
 
     @Override
@@ -58,6 +62,13 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
         AttendanceSession saved = attendanceSessionRepository.save(session);
+
+        auditLogService.recordLog(
+                AuditAction.RECORD_ATTENDANCE,
+                "AttendanceSession",
+                saved.getId().toString(),
+                "Marked attendance for course " + session.getCourse().getCode() + " on " + session.getSessionDate()
+        );
 
         // Check for attendance shortage and notify observers
         if (request.records() != null && !request.records().isEmpty()) {
@@ -95,6 +106,13 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
         AttendanceSession saved = attendanceSessionRepository.save(session);
+
+        auditLogService.recordLog(
+                AuditAction.RECORD_ATTENDANCE,
+                "AttendanceSession",
+                saved.getId().toString(),
+                "Marked attendance for course " + session.getCourse().getCode() + " on " + session.getSessionDate()
+        );
 
         // Check for attendance shortage and notify observers
         if (records != null && !records.isEmpty()) {

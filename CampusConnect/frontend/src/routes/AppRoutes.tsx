@@ -21,6 +21,7 @@ import { StudentAttendance } from '../pages/student/StudentAttendance';
 import { StudentGrades } from '../pages/student/StudentGrades';
 import { AdminTimetable } from '../pages/admin/AdminTimetable';
 import { AdminAnalytics } from '../pages/admin/AdminAnalytics';
+import { AdminAuditLogs } from '../pages/admin/AdminAuditLogs';
 import { FacultyTimetable } from '../pages/faculty/FacultyTimetable';
 import { StudentTimetable } from '../pages/student/StudentTimetable';
 import LandingPage from '../pages/LandingPage';
@@ -44,6 +45,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="enrollments" element={<AdminEnrollmentManagement />} />
           <Route path="timetable" element={<AdminTimetable />} />
           <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="audit-logs" element={<AdminAuditLogs />} />
           <Route path="announcements" element={<AdminAnnouncements />} />
         </Route>
       </Route>

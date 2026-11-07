@@ -6,6 +6,7 @@ import com.campusconnect.dto.UpdateStudentRequest;
 import com.campusconnect.entity.Department;
 import com.campusconnect.entity.Student;
 import com.campusconnect.entity.UserAccount;
+import com.campusconnect.enums.AuditAction;
 import com.campusconnect.enums.Role;
 import com.campusconnect.repository.DepartmentRepository;
 import com.campusconnect.repository.PersonRepository;
@@ -25,19 +26,22 @@ public class StudentServiceImpl implements StudentService {
     private final DepartmentRepository departmentRepository;
     private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     public StudentServiceImpl(
             StudentRepository studentRepository,
             PersonRepository personRepository,
             DepartmentRepository departmentRepository,
             UserAccountRepository userAccountRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            AuditLogService auditLogService
     ) {
         this.studentRepository = studentRepository;
         this.personRepository = personRepository;
         this.departmentRepository = departmentRepository;
         this.userAccountRepository = userAccountRepository;
         this.passwordEncoder = passwordEncoder;
+        this.auditLogService = auditLogService;
     }
 
     @Override
@@ -77,6 +81,13 @@ public class StudentServiceImpl implements StudentService {
                 Role.ROLE_STUDENT
         );
         userAccountRepository.save(account);
+
+        auditLogService.recordLog(
+                AuditAction.CREATE_STUDENT,
+                "Student",
+                savedStudent.getId().toString(),
+                "Created student roll: " + savedStudent.getRollNumber() + ", name: " + savedStudent.getName()
+        );
 
         return mapToResponse(savedStudent);
     }
@@ -126,6 +137,12 @@ public class StudentServiceImpl implements StudentService {
         student.assignDepartment(department);
 
         Student updated = studentRepository.save(student);
+        auditLogService.recordLog(
+                AuditAction.UPDATE_STUDENT,
+                "Student",
+                updated.getId().toString(),
+                "Updated student ID: " + updated.getId() + ", roll: " + updated.getRollNumber()
+        );
         return mapToResponse(updated);
     }
 
@@ -139,6 +156,12 @@ public class StudentServiceImpl implements StudentService {
         student.promoteToNextSemester();
 
         Student updated = studentRepository.save(student);
+        auditLogService.recordLog(
+                AuditAction.PROMOTE_STUDENT,
+                "Student",
+                updated.getId().toString(),
+                "Promoted student " + updated.getRollNumber() + " to semester " + updated.getSemester()
+        );
         return mapToResponse(updated);
     }
 

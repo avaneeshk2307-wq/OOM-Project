@@ -2,6 +2,7 @@ package com.campusconnect.service;
 
 import com.campusconnect.dto.*;
 import com.campusconnect.entity.*;
+import com.campusconnect.enums.AuditAction;
 import com.campusconnect.enums.EnrollmentStatus;
 import com.campusconnect.exception.ResourceNotFoundException;
 import com.campusconnect.event.GradePublishedEvent;
@@ -33,6 +34,7 @@ public class GradeServiceImpl implements GradeService {
     private final GradingStrategyFactory gradingStrategyFactory;
     private final RelativeGradingStrategy relativeGradingStrategy;
     private final ApplicationEventPublisher eventPublisher;
+    private final AuditLogService auditLogService;
 
     public GradeServiceImpl(
             GradeRepository gradeRepository,
@@ -43,7 +45,8 @@ public class GradeServiceImpl implements GradeService {
             @Qualifier("absoluteGradingStrategy") GradingStrategy gradingStrategy,
             GradingStrategyFactory gradingStrategyFactory,
             RelativeGradingStrategy relativeGradingStrategy,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            AuditLogService auditLogService
     ) {
         this.gradeRepository = gradeRepository;
         this.assessmentComponentRepository = assessmentComponentRepository;
@@ -54,6 +57,7 @@ public class GradeServiceImpl implements GradeService {
         this.gradingStrategyFactory = gradingStrategyFactory;
         this.relativeGradingStrategy = relativeGradingStrategy;
         this.eventPublisher = eventPublisher;
+        this.auditLogService = auditLogService;
     }
 
     @Override
@@ -127,6 +131,13 @@ public class GradeServiceImpl implements GradeService {
                 assessment.getMaxMarks(),
                 saved.getLetterGrade()
         ));
+
+        auditLogService.recordLog(
+                AuditAction.SUBMIT_GRADE,
+                "Grade",
+                saved.getId().toString(),
+                "Recorded grade " + saved.getLetterGrade() + " for assessment '" + assessment.getName() + "' (Course: " + assessment.getCourse().getCode() + ")"
+        );
 
         return mapToGradeResponse(saved, result);
     }

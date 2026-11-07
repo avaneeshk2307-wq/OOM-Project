@@ -5,6 +5,7 @@ import com.campusconnect.dto.CourseResponse;
 import com.campusconnect.entity.Course;
 import com.campusconnect.entity.Department;
 import com.campusconnect.entity.Faculty;
+import com.campusconnect.enums.AuditAction;
 import com.campusconnect.enums.EnrollmentStatus;
 import com.campusconnect.repository.CourseRepository;
 import com.campusconnect.repository.DepartmentRepository;
@@ -22,17 +23,20 @@ public class CourseServiceImpl implements CourseService {
     private final DepartmentRepository departmentRepository;
     private final FacultyRepository facultyRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final AuditLogService auditLogService;
 
     public CourseServiceImpl(
             CourseRepository courseRepository,
             DepartmentRepository departmentRepository,
             FacultyRepository facultyRepository,
-            EnrollmentRepository enrollmentRepository
+            EnrollmentRepository enrollmentRepository,
+            AuditLogService auditLogService
     ) {
         this.courseRepository = courseRepository;
         this.departmentRepository = departmentRepository;
         this.facultyRepository = facultyRepository;
         this.enrollmentRepository = enrollmentRepository;
+        this.auditLogService = auditLogService;
     }
 
     @Override
@@ -63,6 +67,12 @@ public class CourseServiceImpl implements CourseService {
         );
 
         Course saved = courseRepository.save(course);
+        auditLogService.recordLog(
+                AuditAction.CREATE_COURSE,
+                "Course",
+                saved.getId().toString(),
+                "Created course: " + saved.getCode() + " - " + saved.getTitle()
+        );
         return mapToResponse(saved);
     }
 
@@ -121,6 +131,12 @@ public class CourseServiceImpl implements CourseService {
         }
 
         Course updated = courseRepository.save(course);
+        auditLogService.recordLog(
+                AuditAction.UPDATE_COURSE,
+                "Course",
+                updated.getId().toString(),
+                "Updated course code/info: " + updated.getCode()
+        );
         return mapToResponse(updated);
     }
 
@@ -135,6 +151,12 @@ public class CourseServiceImpl implements CourseService {
 
         course.assignInstructor(faculty);
         Course updated = courseRepository.save(course);
+        auditLogService.recordLog(
+                AuditAction.ASSIGN_FACULTY,
+                "Course",
+                updated.getId().toString(),
+                "Assigned faculty " + faculty.getName() + " to course " + updated.getCode()
+        );
         return mapToResponse(updated);
     }
 
