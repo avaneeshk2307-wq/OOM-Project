@@ -10,6 +10,7 @@ import { CourseManagement } from '../pages/admin/CourseManagement';
 import { FacultyManagement } from '../pages/admin/FacultyManagement';
 import { StudentManagement } from '../pages/admin/StudentManagement';
 import { AdminEnrollmentManagement } from '../pages/admin/AdminEnrollmentManagement';
+import { AdminAnnouncements } from '../pages/admin/AdminAnnouncements';
 import { FacultyOverview } from '../pages/faculty/FacultyOverview';
 import { StudentOverview } from '../pages/student/StudentOverview';
 import { StudentCatalog } from '../pages/student/StudentCatalog';
@@ -37,7 +38,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="faculty" element={<FacultyManagement />} />
           <Route path="students" element={<StudentManagement />} />
           <Route path="enrollments" element={<AdminEnrollmentManagement />} />
-          <Route path="announcements" element={<AdminOverview />} />
+          <Route path="announcements" element={<AdminAnnouncements />} />
         </Route>
       </Route>
 
