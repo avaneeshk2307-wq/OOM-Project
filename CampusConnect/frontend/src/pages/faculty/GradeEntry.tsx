@@ -202,7 +202,7 @@ export const GradeEntry: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Academic Grading Center</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Evaluate student coursework and dynamically compute grades via GoF Strategy Design Pattern.
+            Evaluate student coursework and compute grades according to academic grading policies.
           </p>
         </div>
         <button
@@ -277,10 +277,10 @@ export const GradeEntry: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-indigo-600" />
-              <h3 className="font-bold text-gray-900 text-sm">Grading Algorithm (GoF Strategy Pattern)</h3>
+              <h3 className="font-bold text-gray-900 text-sm">Grading Evaluation Policy</h3>
             </div>
             <p className="text-xs text-gray-500 mt-0.5">
-              Select which polymorphic grading algorithm evaluates student scores during submission.
+              Select standard criterion grading or relative bell-curve grading for this evaluation.
             </p>
           </div>
 

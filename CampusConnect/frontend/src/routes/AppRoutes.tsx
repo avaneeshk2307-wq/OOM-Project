@@ -24,13 +24,12 @@ import { AdminAnalytics } from '../pages/admin/AdminAnalytics';
 import { AdminAuditLogs } from '../pages/admin/AdminAuditLogs';
 import { FacultyTimetable } from '../pages/faculty/FacultyTimetable';
 import { StudentTimetable } from '../pages/student/StudentTimetable';
-import LandingPage from '../pages/LandingPage';
 
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<LandingPage />} />
+      {/* Public Routes - Root and Login both serve the official portal login */}
+      <Route path="/" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 

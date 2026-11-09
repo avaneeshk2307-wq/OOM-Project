@@ -83,7 +83,7 @@ export const AdminEnrollmentManagement: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Course Enrollment Workflow</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Manage course registrations using the Object-Oriented State Pattern lifecycle.
+            Review, approve, and manage official student course registration applications.
           </p>
         </div>
         <button

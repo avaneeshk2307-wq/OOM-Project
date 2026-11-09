@@ -265,7 +265,7 @@ export const StudentManagement: React.FC = () => {
                       <button
                         onClick={() => handlePromote(s.id, s.semester, s.name)}
                         className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors"
-                        title="Promote to Next Semester (OOM Encapsulation)"
+                        title="Promote to Next Semester"
                       >
                         <TrendingUp className="w-3.5 h-3.5" />
                         <span>Promote</span>
