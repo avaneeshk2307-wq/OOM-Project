@@ -54,3 +54,4 @@ public class AcademicEventListener {
         notificationService.createNotificationForPerson(event.studentId(), title, message, NotificationType.ENROLLMENT_UPDATE);
     }
 }
+

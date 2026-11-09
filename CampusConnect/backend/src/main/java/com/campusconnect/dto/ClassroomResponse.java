@@ -11,3 +11,4 @@ public record ClassroomResponse(
         RoomType roomType,
         Instant createdAt
 ) {}
+

@@ -84,3 +84,4 @@ public class RelativeGradingStrategy implements GradingStrategy {
         return "Relative Norm-Referenced Curve Grading (Gaussian Distribution)";
     }
 }
+

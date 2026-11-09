@@ -4,3 +4,4 @@ public enum GradingMode {
     ABSOLUTE,
     RELATIVE
 }
+

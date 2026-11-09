@@ -25,3 +25,4 @@ public record CreateTimetableRequest(
         @JsonFormat(pattern = "HH:mm")
         LocalTime endTime
 ) {}
+

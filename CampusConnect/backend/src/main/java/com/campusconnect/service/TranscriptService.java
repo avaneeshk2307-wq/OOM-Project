@@ -63,3 +63,4 @@ public class TranscriptService {
         return generateTranscriptForStudent(studentId);
     }
 }
+

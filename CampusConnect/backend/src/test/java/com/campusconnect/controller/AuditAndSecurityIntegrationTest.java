@@ -124,3 +124,4 @@ class AuditAndSecurityIntegrationTest {
                 .andExpect(status().isUnauthorized());
     }
 }
+

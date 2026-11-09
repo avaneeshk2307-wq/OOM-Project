@@ -183,3 +183,4 @@ export const OfficialTranscriptModal: React.FC<OfficialTranscriptModalProps> = (
     </div>
   );
 };
+

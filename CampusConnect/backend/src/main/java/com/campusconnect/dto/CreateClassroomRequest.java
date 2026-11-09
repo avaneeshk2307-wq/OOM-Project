@@ -19,3 +19,4 @@ public record CreateClassroomRequest(
         @NotNull(message = "Room type is required")
         RoomType roomType
 ) {}
+

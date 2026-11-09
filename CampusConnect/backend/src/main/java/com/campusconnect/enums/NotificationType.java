@@ -6,3 +6,4 @@ public enum NotificationType {
     ENROLLMENT_UPDATE,
     SYSTEM
 }
+

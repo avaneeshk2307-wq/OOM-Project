@@ -43,3 +43,4 @@ export interface CreateTimetableRequest {
   startTime: string;
   endTime: string;
 }
+

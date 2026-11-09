@@ -17,3 +17,4 @@ public interface TranscriptBuilder {
     TranscriptBuilder buildSignatures(String registrarName, String officialSeal);
     AcademicTranscriptReport build();
 }
+

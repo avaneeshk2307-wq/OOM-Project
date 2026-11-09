@@ -6,3 +6,4 @@ public enum RoomType {
     SEMINAR_ROOM,
     AUDITORIUM
 }
+

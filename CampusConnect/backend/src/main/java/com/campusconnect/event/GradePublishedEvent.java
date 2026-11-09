@@ -11,3 +11,4 @@ public record GradePublishedEvent(
         BigDecimal maxMarks,
         String letterGrade
 ) {}
+

@@ -72,3 +72,4 @@ class TranscriptBuilderTest {
         assertThat(report.summary().academicStanding()).contains("Probation");
     }
 }
+

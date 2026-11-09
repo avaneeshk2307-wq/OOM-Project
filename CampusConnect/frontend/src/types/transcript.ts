@@ -54,3 +54,4 @@ export interface AcademicTranscriptReport {
   summary: TranscriptSummary;
   signatures: TranscriptSignatures;
 }
+

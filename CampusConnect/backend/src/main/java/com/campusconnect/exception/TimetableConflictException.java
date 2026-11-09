@@ -5,3 +5,4 @@ public class TimetableConflictException extends RuntimeException {
         super(message);
     }
 }
+

@@ -82,3 +82,4 @@ class AuditLogServiceTest {
         assertThat(recent.get(0).action()).isEqualTo(AuditAction.ASSIGN_FACULTY);
     }
 }
+

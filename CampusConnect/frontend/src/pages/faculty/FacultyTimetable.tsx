@@ -78,3 +78,4 @@ export const FacultyTimetable: React.FC = () => {
     </div>
   );
 };
+

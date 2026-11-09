@@ -20,3 +20,4 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
     long countByAction(AuditAction action);
 }
+

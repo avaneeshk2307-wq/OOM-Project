@@ -11,3 +11,4 @@ public record NotificationResponse(
         boolean isRead,
         Instant createdAt
 ) {}
+

@@ -175,3 +175,4 @@ class TimetableServiceTest {
         assertThat(entry.overlapsWith(DayOfWeek.TUESDAY, LocalTime.of(12, 0), LocalTime.of(14, 0))).isFalse();
     }
 }
+

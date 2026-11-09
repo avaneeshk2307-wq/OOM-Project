@@ -18,3 +18,4 @@ public enum AuditAction {
     POST_ANNOUNCEMENT,
     SECURITY_EVENT
 }
+

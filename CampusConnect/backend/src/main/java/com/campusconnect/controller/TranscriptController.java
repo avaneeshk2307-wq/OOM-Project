@@ -29,3 +29,4 @@ public class TranscriptController {
         return ResponseEntity.ok(transcriptService.generateTranscriptForStudent(studentId));
     }
 }
+

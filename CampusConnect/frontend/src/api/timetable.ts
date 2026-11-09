@@ -47,3 +47,4 @@ export const timetableApi = {
     await apiClient.delete(`/timetable/classrooms/${id}`);
   },
 };
+

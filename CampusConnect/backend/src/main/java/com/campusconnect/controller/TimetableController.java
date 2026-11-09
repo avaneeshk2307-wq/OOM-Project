@@ -103,3 +103,4 @@ public class TimetableController {
         return ResponseEntity.noContent().build();
     }
 }
+

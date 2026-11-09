@@ -14,3 +14,4 @@ public record CourseGradeDistributionResponse(
         Map<String, Long> absoluteDistribution,
         Map<String, Long> relativeDistribution
 ) {}
+

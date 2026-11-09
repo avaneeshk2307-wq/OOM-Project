@@ -151,3 +151,4 @@ public class TimetableEntry {
         return Objects.hash(id);
     }
 }
+

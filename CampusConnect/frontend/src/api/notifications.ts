@@ -20,3 +20,4 @@ export const notificationApi = {
     await apiClient.put('/notifications/read-all');
   },
 };
+

@@ -12,3 +12,4 @@ export const transcriptApi = {
     return response.data;
   },
 };
+

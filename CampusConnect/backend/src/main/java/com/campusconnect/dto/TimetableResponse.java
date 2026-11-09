@@ -23,3 +23,4 @@ public record TimetableResponse(
         LocalTime endTime,
         Instant createdAt
 ) {}
+

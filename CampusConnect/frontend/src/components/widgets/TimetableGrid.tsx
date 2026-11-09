@@ -103,3 +103,4 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({ entries, onDelete,
     </div>
   );
 };
+

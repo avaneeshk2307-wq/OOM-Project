@@ -45,3 +45,4 @@ public record CampusAnalyticsResponse(
             long weeklyScheduledSlots
     ) {}
 }
+

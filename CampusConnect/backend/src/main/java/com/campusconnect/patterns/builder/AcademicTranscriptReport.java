@@ -64,3 +64,4 @@ public record AcademicTranscriptReport(
             String verificationUrl
     ) {}
 }
+

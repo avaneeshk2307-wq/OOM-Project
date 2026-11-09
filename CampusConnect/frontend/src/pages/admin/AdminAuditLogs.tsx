@@ -345,3 +345,4 @@ export const AdminAuditLogs: React.FC = () => {
     </div>
   );
 };
+

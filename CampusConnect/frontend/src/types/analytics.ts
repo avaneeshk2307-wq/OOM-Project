@@ -40,3 +40,4 @@ export interface CampusAnalyticsResponse {
   gradeDistribution: Record<string, number>;
   facultyWorkload: FacultyWorkloadMetric[];
 }
+

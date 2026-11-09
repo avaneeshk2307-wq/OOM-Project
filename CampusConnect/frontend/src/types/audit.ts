@@ -36,3 +36,4 @@ export interface PaginatedAuditLogs {
   first: boolean;
   last: boolean;
 }
+

@@ -8,3 +8,4 @@ public record AttendanceShortageEvent(
         long totalSessions,
         double attendancePercentage
 ) {}
+

@@ -6,3 +6,4 @@ public record EnrollmentApprovedEvent(
         String courseCode,
         String courseTitle
 ) {}
+

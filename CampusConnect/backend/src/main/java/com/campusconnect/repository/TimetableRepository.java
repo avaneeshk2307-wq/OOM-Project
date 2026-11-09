@@ -42,3 +42,4 @@ public interface TimetableRepository extends JpaRepository<TimetableEntry, Long>
                                              @Param("startTime") LocalTime startTime,
                                              @Param("endTime") LocalTime endTime);
 }
+
