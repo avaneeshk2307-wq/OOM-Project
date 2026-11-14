@@ -27,6 +27,12 @@ export const StudentManagement: React.FC = () => {
   const [selectedDept, setSelectedDept] = useState<number | ''>('');
   const [selectedSemester, setSelectedSemester] = useState<number | ''>('');
 
+  // Pagination
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const pageSize = 10;
+
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
@@ -38,20 +44,32 @@ export const StudentManagement: React.FC = () => {
   const [initialPassword, setInitialPassword] = useState('student123');
   const [submitting, setSubmitting] = useState(false);
 
-  const loadData = async () => {
+  const loadData = async (targetPage = page) => {
     setLoading(true);
     try {
-      const params: any = {};
+      const params: any = {
+        page: targetPage,
+        size: pageSize,
+      };
       if (searchQuery.trim()) params.query = searchQuery.trim();
       if (selectedDept) params.departmentId = selectedDept;
       if (selectedSemester) params.semester = selectedSemester;
 
       const [studentsRes, deptsRes] = await Promise.all([
-        apiClient.get<Student[]>('/admin/students', { params }),
+        apiClient.get<any>('/admin/students', { params }),
         apiClient.get<Department[]>('/admin/departments'),
       ]);
 
-      setStudents(studentsRes.data);
+      const data = studentsRes.data;
+      if (Array.isArray(data)) {
+        setStudents(data);
+        setTotalElements(data.length);
+        setTotalPages(Math.ceil(data.length / pageSize) || 1);
+      } else {
+        setStudents(data.content || []);
+        setTotalElements(data.totalElements ?? 0);
+        setTotalPages(data.totalPages ?? 1);
+      }
       setDepartments(deptsRes.data);
       setError(null);
     } catch (err: any) {
@@ -62,8 +80,12 @@ export const StudentManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    loadData();
+    setPage(0);
   }, [searchQuery, selectedDept, selectedSemester]);
+
+  useEffect(() => {
+    loadData(page);
+  }, [page, searchQuery, selectedDept, selectedSemester]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -282,6 +304,36 @@ export const StudentManagement: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {totalElements > 0 && (
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between">
+            <span className="text-xs text-slate-500">
+              Showing <span className="font-semibold text-slate-700">{page * pageSize + 1}</span> to{' '}
+              <span className="font-semibold text-slate-700">{Math.min((page + 1) * pageSize, totalElements)}</span> of{' '}
+              <span className="font-semibold text-slate-700">{totalElements}</span> students
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(p => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="px-3 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <span className="text-xs text-slate-600 px-2">
+                Page {page + 1} of {Math.max(1, totalPages)}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+                className="px-3 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

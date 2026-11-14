@@ -41,7 +41,7 @@ entity "faculty" as faculty {
 entity "admins" as admins {
     * id : BIGINT <<PK, FK to persons>>
     --
-    * role_title : VARCHAR(100)
+    * access_level : VARCHAR(50)
 }
 
 entity "user_accounts" as user_accounts {
@@ -65,7 +65,7 @@ entity "courses" as courses {
     * semester : INT
     * capacity : INT
     * department_id : BIGINT <<FK to departments>>
-    instructor_id : BIGINT <<FK to faculty>>
+    faculty_id : BIGINT <<FK to faculty>>
     * created_at : TIMESTAMPTZ
 }
 
@@ -119,10 +119,11 @@ entity "enrollments" as enrollments {
     --
     * student_id : BIGINT <<FK to students>>
     * course_id : BIGINT <<FK to courses>>
+    * semester : INT
     * status : VARCHAR(30)
-    * enrolled_at : TIMESTAMPTZ
+    * registered_at : TIMESTAMPTZ
     --
-    UQ: (student_id, course_id)
+    UQ: (student_id, course_id, semester)
 }
 
 entity "course_assessments" as course_assessments {
@@ -130,9 +131,9 @@ entity "course_assessments" as course_assessments {
     --
     * course_id : BIGINT <<FK to courses>>
     * name : VARCHAR(100)
-    * assessment_type : VARCHAR(50)
+    * type : VARCHAR(50)
     * max_marks : NUMERIC(5,2)
-    * weightage : NUMERIC(5,2)
+    * weightage_percentage : NUMERIC(5,2)
     * created_at : TIMESTAMPTZ
 }
 

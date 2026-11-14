@@ -24,10 +24,11 @@ export const StudentCatalog: React.FC = () => {
     setLoading(true);
     try {
       const [coursesRes, enrollRes] = await Promise.all([
-        apiClient.get<Course[]>('/admin/courses'),
+        apiClient.get<any>('/admin/courses', { params: { size: 100 } }),
         apiClient.get<Enrollment[]>('/enrollments/my-enrollments'),
       ]);
-      setCourses(coursesRes.data);
+      const coursesData = coursesRes.data;
+      setCourses(Array.isArray(coursesData) ? coursesData : (coursesData?.content || []));
       setMyEnrollments(enrollRes.data);
       setError(null);
     } catch (err: any) {

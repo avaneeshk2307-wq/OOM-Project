@@ -179,6 +179,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<EnrollmentResponse> getAllEnrollmentsPaged(
+            EnrollmentStatus status, org.springframework.data.domain.Pageable pageable) {
+        return enrollmentRepository.findEnrollmentsFiltered(status, pageable).map(this::mapToResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<EnrollmentResponse> getEnrollmentsByStudent(Long studentId) {
         return enrollmentRepository.findByStudentId(studentId).stream()
                 .map(this::mapToResponse)

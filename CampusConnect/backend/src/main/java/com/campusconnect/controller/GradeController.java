@@ -74,7 +74,7 @@ public class GradeController {
     }
 
     @GetMapping("/student/{studentId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FACULTY', 'ROLE_STUDENT')")
+    @PreAuthorize("@academicSecurityService.canAccessStudentRecord(#studentId)")
     public ResponseEntity<List<StudentCourseGradeReport>> getStudentGradeReports(@PathVariable Long studentId) {
         return ResponseEntity.ok(gradeService.getStudentGradeReports(studentId));
     }

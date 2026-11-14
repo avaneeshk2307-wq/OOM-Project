@@ -103,6 +103,12 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<FacultyResponse> getAllFacultyPaged(org.springframework.data.domain.Pageable pageable) {
+        return facultyRepository.findAll(pageable).map(this::mapToResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<FacultyResponse> getFacultyByDepartment(Long departmentId) {
         return facultyRepository.findByDepartmentId(departmentId).stream()
                 .map(this::mapToResponse)

@@ -19,15 +19,30 @@ export const AdminEnrollmentManagement: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
-  const fetchEnrollments = async () => {
+  // Pagination
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const pageSize = 10;
+
+  const fetchEnrollments = async (targetPage = page) => {
     try {
       setLoading(true);
       setError(null);
       const url = statusFilter === 'ALL' 
         ? '/enrollments' 
         : `/enrollments?status=${statusFilter}`;
-      const res = await apiClient.get<Enrollment[]>(url);
-      setEnrollments(res.data);
+      const res = await apiClient.get<any>(url, { params: { page: targetPage, size: pageSize } });
+      const data = res.data;
+      if (Array.isArray(data)) {
+        setEnrollments(data);
+        setTotalElements(data.length);
+        setTotalPages(Math.ceil(data.length / pageSize) || 1);
+      } else {
+        setEnrollments(data.content || []);
+        setTotalElements(data.totalElements ?? 0);
+        setTotalPages(data.totalPages ?? 1);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch enrollment records');
     } finally {
@@ -36,8 +51,12 @@ export const AdminEnrollmentManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchEnrollments();
+    setPage(0);
   }, [statusFilter]);
+
+  useEffect(() => {
+    fetchEnrollments(page);
+  }, [page, statusFilter]);
 
   const handleAction = async (id: number, action: 'approve' | 'finalize' | 'drop' | 'reject') => {
     try {
@@ -87,7 +106,7 @@ export const AdminEnrollmentManagement: React.FC = () => {
           </p>
         </div>
         <button
-          onClick={fetchEnrollments}
+          onClick={() => fetchEnrollments(page)}
           className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
         >
           <RotateCcw className="w-4 h-4" />
@@ -261,6 +280,36 @@ export const AdminEnrollmentManagement: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {totalElements > 0 && (
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between">
+            <span className="text-xs text-slate-500">
+              Showing <span className="font-semibold text-slate-700">{page * pageSize + 1}</span> to{' '}
+              <span className="font-semibold text-slate-700">{Math.min((page + 1) * pageSize, totalElements)}</span> of{' '}
+              <span className="font-semibold text-slate-700">{totalElements}</span> enrollments
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(p => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="px-3 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <span className="text-xs text-slate-600 px-2">
+                Page {page + 1} of {Math.max(1, totalPages)}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+                className="px-3 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

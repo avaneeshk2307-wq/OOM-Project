@@ -20,6 +20,12 @@ export const FacultyManagement: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Pagination
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const pageSize = 10;
+
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
@@ -31,14 +37,24 @@ export const FacultyManagement: React.FC = () => {
   const [initialPassword, setInitialPassword] = useState('faculty123');
   const [submitting, setSubmitting] = useState(false);
 
-  const loadData = async () => {
+  const loadData = async (targetPage = page) => {
     setLoading(true);
     try {
       const [facRes, deptsRes] = await Promise.all([
-        apiClient.get<Faculty[]>('/admin/faculty'),
+        apiClient.get<any>('/admin/faculty', { params: { page: targetPage, size: pageSize } }),
         apiClient.get<Department[]>('/admin/departments'),
       ]);
-      setFaculties(facRes.data);
+
+      const data = facRes.data;
+      if (Array.isArray(data)) {
+        setFaculties(data);
+        setTotalElements(data.length);
+        setTotalPages(Math.ceil(data.length / pageSize) || 1);
+      } else {
+        setFaculties(data.content || []);
+        setTotalElements(data.totalElements ?? 0);
+        setTotalPages(data.totalPages ?? 1);
+      }
       setDepartments(deptsRes.data);
       setError(null);
     } catch (err: any) {
@@ -49,8 +65,8 @@ export const FacultyManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData(page);
+  }, [page]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,6 +224,36 @@ export const FacultyManagement: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {totalElements > 0 && (
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between">
+            <span className="text-xs text-slate-500">
+              Showing <span className="font-semibold text-slate-700">{page * pageSize + 1}</span> to{' '}
+              <span className="font-semibold text-slate-700">{Math.min((page + 1) * pageSize, totalElements)}</span> of{' '}
+              <span className="font-semibold text-slate-700">{totalElements}</span> faculty members
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(p => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="px-3 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <span className="text-xs text-slate-600 px-2">
+                Page {page + 1} of {Math.max(1, totalPages)}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+                className="px-3 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

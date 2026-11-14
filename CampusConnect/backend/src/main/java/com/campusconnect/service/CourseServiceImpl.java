@@ -94,6 +94,12 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<CourseResponse> getAllCoursesPaged(org.springframework.data.domain.Pageable pageable) {
+        return courseRepository.findAll(pageable).map(this::mapToResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<CourseResponse> getCoursesByDepartment(Long departmentId) {
         return courseRepository.findByDepartmentId(departmentId).stream()
                 .map(this::mapToResponse)

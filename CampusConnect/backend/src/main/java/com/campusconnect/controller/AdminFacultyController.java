@@ -31,8 +31,20 @@ public class AdminFacultyController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FacultyResponse>> getAllFaculty() {
-        return ResponseEntity.ok(facultyService.getAllFaculty());
+    public ResponseEntity<org.springframework.data.domain.Page<FacultyResponse>> getAllFaculty(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id,asc") String sort
+    ) {
+        int boundedPage = Math.max(0, page);
+        int boundedSize = Math.min(Math.max(1, size), 100);
+        String[] sortParts = sort.split(",");
+        org.springframework.data.domain.Sort.Direction dir = (sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc"))
+                ? org.springframework.data.domain.Sort.Direction.DESC
+                : org.springframework.data.domain.Sort.Direction.ASC;
+        org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(boundedPage, boundedSize, org.springframework.data.domain.Sort.by(dir, sortParts[0].trim()));
+        return ResponseEntity.ok(facultyService.getAllFacultyPaged(pageable));
     }
 
     @GetMapping("/{id}")

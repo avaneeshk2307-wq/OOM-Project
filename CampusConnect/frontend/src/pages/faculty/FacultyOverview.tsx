@@ -17,10 +17,10 @@ export const FacultyOverview: React.FC = () => {
       try {
         setLoading(true);
         const [coursesRes, annRes] = await Promise.all([
-          apiClient.get<Course[]>('/admin/courses'),
+          apiClient.get<any>('/admin/courses', { params: { size: 100 } }),
           apiClient.get<Announcement[]>('/announcements')
         ]);
-        setCourses(coursesRes.data);
+        setCourses(Array.isArray(coursesRes.data) ? coursesRes.data : (coursesRes.data?.content || []));
         setAnnouncements(annRes.data);
       } catch (err) {
         console.error('Failed to load faculty dashboard data', err);

@@ -18,6 +18,12 @@ export const CourseManagement: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Pagination
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const pageSize = 10;
+
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [code, setCode] = useState('');
@@ -30,17 +36,28 @@ export const CourseManagement: React.FC = () => {
   const [instructorId, setInstructorId] = useState<number | ''>('');
   const [submitting, setSubmitting] = useState(false);
 
-  const loadData = async () => {
+  const loadData = async (targetPage = page) => {
     setLoading(true);
     try {
       const [coursesRes, deptsRes, facRes] = await Promise.all([
-        apiClient.get<Course[]>('/admin/courses'),
+        apiClient.get<any>('/admin/courses', { params: { page: targetPage, size: pageSize } }),
         apiClient.get<Department[]>('/admin/departments'),
-        apiClient.get<Faculty[]>('/admin/faculty'),
+        apiClient.get<any>('/admin/faculty', { params: { size: 100 } }),
       ]);
-      setCourses(coursesRes.data);
+
+      const coursesData = coursesRes.data;
+      if (Array.isArray(coursesData)) {
+        setCourses(coursesData);
+        setTotalElements(coursesData.length);
+        setTotalPages(Math.ceil(coursesData.length / pageSize) || 1);
+      } else {
+        setCourses(coursesData.content || []);
+        setTotalElements(coursesData.totalElements ?? 0);
+        setTotalPages(coursesData.totalPages ?? 1);
+      }
       setDepartments(deptsRes.data);
-      setFaculties(facRes.data);
+      const facData = facRes.data;
+      setFaculties(Array.isArray(facData) ? facData : (facData.content || []));
       setError(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load courses.');
@@ -50,8 +67,8 @@ export const CourseManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData(page);
+  }, [page]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -233,6 +250,36 @@ export const CourseManagement: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {totalElements > 0 && (
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between">
+            <span className="text-xs text-slate-500">
+              Showing <span className="font-semibold text-slate-700">{page * pageSize + 1}</span> to{' '}
+              <span className="font-semibold text-slate-700">{Math.min((page + 1) * pageSize, totalElements)}</span> of{' '}
+              <span className="font-semibold text-slate-700">{totalElements}</span> courses
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(p => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="px-3 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <span className="text-xs text-slate-600 px-2">
+                Page {page + 1} of {Math.max(1, totalPages)}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+                className="px-3 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

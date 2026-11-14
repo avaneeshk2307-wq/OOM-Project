@@ -152,7 +152,15 @@ export const DashboardLayout: React.FC = () => {
 
         {/* Dynamic Content Area */}
         <main className="flex-1 min-w-0">
-          <Outlet />
+          <React.Suspense
+            fallback={
+              <div className="p-8 flex items-center justify-center min-h-[300px]">
+                <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            }
+          >
+            <Outlet />
+          </React.Suspense>
         </main>
       </div>
     </div>

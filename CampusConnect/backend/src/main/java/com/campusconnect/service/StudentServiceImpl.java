@@ -124,6 +124,16 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<StudentResponse> getAllStudentsPaged(
+            String query, Long departmentId, Integer semester, org.springframework.data.domain.Pageable pageable) {
+        String cleanQuery = (query != null && !query.trim().isEmpty()) ? query.trim() : null;
+        org.springframework.data.domain.Page<Student> studentPage = 
+                studentRepository.findStudentsFiltered(cleanQuery, departmentId, semester, pageable);
+        return studentPage.map(this::mapToResponse);
+    }
+
+    @Override
     @Transactional
     public StudentResponse updateStudent(Long id, UpdateStudentRequest request) {
         Student student = studentRepository.findById(id)

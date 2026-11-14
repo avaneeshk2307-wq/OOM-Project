@@ -18,11 +18,11 @@ public record CreateTimetableRequest(
         DayOfWeek dayOfWeek,
 
         @NotNull(message = "Start time is required")
-        @JsonFormat(pattern = "HH:mm")
+        @JsonFormat(pattern = "HH:mm[:ss]")
         LocalTime startTime,
 
         @NotNull(message = "End time is required")
-        @JsonFormat(pattern = "HH:mm")
+        @JsonFormat(pattern = "HH:mm[:ss]")
         LocalTime endTime
 ) {}
 

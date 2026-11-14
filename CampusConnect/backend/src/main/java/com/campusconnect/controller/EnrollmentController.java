@@ -53,14 +53,25 @@ public class EnrollmentController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<List<EnrollmentResponse>> getAllEnrollments(
-            @RequestParam(required = false) EnrollmentStatus status
+    public ResponseEntity<org.springframework.data.domain.Page<EnrollmentResponse>> getAllEnrollments(
+            @RequestParam(required = false) EnrollmentStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id,asc") String sort
     ) {
-        return ResponseEntity.ok(enrollmentService.getAllEnrollments(status));
+        int boundedPage = Math.max(0, page);
+        int boundedSize = Math.min(Math.max(1, size), 100);
+        String[] sortParts = sort.split(",");
+        org.springframework.data.domain.Sort.Direction dir = (sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc"))
+                ? org.springframework.data.domain.Sort.Direction.DESC
+                : org.springframework.data.domain.Sort.Direction.ASC;
+        org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(boundedPage, boundedSize, org.springframework.data.domain.Sort.by(dir, sortParts[0].trim()));
+        return ResponseEntity.ok(enrollmentService.getAllEnrollmentsPaged(status, pageable));
     }
 
     @GetMapping("/student/{studentId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_STUDENT')")
+    @PreAuthorize("@academicSecurityService.canAccessStudentRecord(#studentId)")
     public ResponseEntity<List<EnrollmentResponse>> getStudentEnrollments(@PathVariable Long studentId) {
         return ResponseEntity.ok(enrollmentService.getEnrollmentsByStudent(studentId));
     }

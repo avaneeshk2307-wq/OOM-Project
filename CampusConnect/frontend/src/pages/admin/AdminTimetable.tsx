@@ -41,13 +41,15 @@ export const AdminTimetable: React.FC = () => {
       const [entriesData, classroomsData, coursesRes, facultiesRes] = await Promise.all([
         timetableApi.getAllTimetables(),
         timetableApi.getClassrooms(),
-        apiClient.get<Course[]>('/admin/courses'),
-        apiClient.get<Faculty[]>('/admin/faculty'),
+        apiClient.get<any>('/admin/courses', { params: { size: 100 } }),
+        apiClient.get<any>('/admin/faculty', { params: { size: 100 } }),
       ]);
       setEntries(entriesData);
       setClassrooms(classroomsData);
-      setCourses(coursesRes.data);
-      setFaculties(facultiesRes.data);
+      const coursesData = coursesRes.data;
+      setCourses(Array.isArray(coursesData) ? coursesData : (coursesData?.content || []));
+      const facultiesData = facultiesRes.data;
+      setFaculties(Array.isArray(facultiesData) ? facultiesData : (facultiesData?.content || []));
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load timetable and classroom data');
     } finally {

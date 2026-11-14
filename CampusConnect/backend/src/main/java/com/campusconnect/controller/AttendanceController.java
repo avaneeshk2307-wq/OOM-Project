@@ -59,7 +59,7 @@ public class AttendanceController {
     }
 
     @GetMapping("/student/{studentId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FACULTY', 'ROLE_STUDENT')")
+    @PreAuthorize("@academicSecurityService.canAccessStudentRecord(#studentId)")
     public ResponseEntity<List<StudentCourseAttendanceSummary>> getStudentAttendanceSummary(@PathVariable Long studentId) {
         return ResponseEntity.ok(attendanceService.getStudentAttendanceSummary(studentId));
     }

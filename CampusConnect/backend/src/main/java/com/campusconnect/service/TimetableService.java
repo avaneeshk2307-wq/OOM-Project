@@ -96,6 +96,12 @@ public class TimetableService {
                     classroom.getRoomNumber(), classroom.getCapacity(), course.getCode(), course.getCapacity()));
         }
 
+        // Time order validation
+        if (request.startTime() != null && request.endTime() != null && !request.startTime().isBefore(request.endTime())) {
+            throw new IllegalArgumentException(String.format(
+                    "Start time (%s) must be strictly before end time (%s)", request.startTime(), request.endTime()));
+        }
+
         // 1. Classroom Conflict Check
         List<TimetableEntry> roomConflicts = timetableRepository.findClassroomConflicts(
                 classroom.getId(), request.dayOfWeek(), request.startTime(), request.endTime());

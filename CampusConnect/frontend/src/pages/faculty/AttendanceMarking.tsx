@@ -38,10 +38,11 @@ export const AttendanceMarking: React.FC = () => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const res = await apiClient.get<Course[]>('/admin/courses');
-        setCourses(res.data);
-        if (res.data.length > 0) {
-          setSelectedCourseId(res.data[0].id);
+        const res = await apiClient.get<any>('/admin/courses', { params: { size: 100 } });
+        const courseList = Array.isArray(res.data) ? res.data : (res.data?.content || []);
+        setCourses(courseList);
+        if (courseList.length > 0) {
+          setSelectedCourseId(courseList[0].id);
         }
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to load courses.');

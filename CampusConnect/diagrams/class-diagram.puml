@@ -40,8 +40,8 @@ package "com.campusconnect.entity (Core Domain Entities)" {
     }
 
     class Admin {
-        - String roleTitle
-        + getRoleTitle(): String
+        - String accessLevel
+        + getAccessLevel(): String
     }
 
     class Department {
@@ -129,12 +129,12 @@ package "com.campusconnect.entity (Core Domain Entities)" {
     class Enrollment {
         - Long id
         - EnrollmentStatus status
-        - Instant enrolledAt
+        - Instant registeredAt
         + getId(): Long
         + getStatus(): EnrollmentStatus
-        + request(): void
+        + submit(): void
         + approve(): void
-        + enroll(): void
+        + finalizeEnrollment(): void
         + drop(): void
         + reject(): void
     }
@@ -144,11 +144,11 @@ package "com.campusconnect.entity (Core Domain Entities)" {
         - String name
         - AssessmentType type
         - BigDecimal maxMarks
-        - BigDecimal weightage
+        - BigDecimal weightagePercentage
         + getId(): Long
         + getName(): String
         + getMaxMarks(): BigDecimal
-        + getWeightage(): BigDecimal
+        + getWeightagePercentage(): BigDecimal
     }
 
     class Grade {
