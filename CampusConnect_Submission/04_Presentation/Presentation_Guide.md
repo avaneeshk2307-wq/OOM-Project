@@ -1,189 +1,154 @@
-# CampusConnect: Presentation & Viva Voce Guide
+# CampusConnect: Presentation & Viva Voce Guide (3-Member Academic Team)
 
 **Project Title:** CampusConnect — Smart Campus Management System  
 **Academic Subject:** Object-Oriented Methodology (OOM)  
 **Slide Deck:** `CampusConnect_OOM_Presentation.pptx` (18 Slides, 16:9 Widescreen)  
-**Target Duration:** 15 – 20 Minutes (followed by 5 – 10 minutes of Viva Voce Q&A)
+**Team Composition:** Three (3) Student Members  
+**Target Duration:** 18 – 20 Minutes (followed by 10 minutes of Viva Voce Q&A)  
 
 ---
 
-## 1. Presentation Structure & Timing Allocation
+## 1. Team Presentation Structure & Time Allocation
 
-| Slide # | Slide Title | Recommended Time | Core Focus |
-|:---:|:---|:---:|:---|
-| **1** | Title Slide & Candidate Introduction | 0.5 min | Introduce self, guide, institution, and project title. |
-| **2** | Executive Summary & Problem Motivation | 1.0 min | Pain points of fragmented campus management. |
-| **3** | System Objectives & Role Governance | 1.0 min | Admin, Faculty, and Student responsibilities. |
-| **4** | System Architecture & Technology Stack | 1.0 min | React 19, Spring Boot 3.3.0, PostgreSQL, JWT. |
-| **5** | Object-Oriented Principles: SOLID & GoF | 1.5 min | Practical mapping of SOLID and design patterns. |
-| **6** | Domain Modeling: Polymorphic Inheritance | 1.0 min | Person base entity and JOINED JPA strategy. |
-| **7** | Use Case Diagram (Actors & Boundaries) | 1.0 min | Walk through Figure 4.1, actors, <<include>>. |
-| **8** | Class Diagram (Structural Design) | 1.5 min | Walk through Figure 4.2, associations, dependencies. |
-| **9** | Sequence Diagram (JWT Authentication) | 1.5 min | Walk through Figure 4.3, token issuance & dispatch. |
-| **10** | Activity Diagram (Course Enrollment) | 1.0 min | Walk through Figure 4.4, decision forks & capacity. |
-| **11** | State Machine (Enrollment Lifecycle) | 1.0 min | Walk through Figure 4.5, discrete states & triggers. |
-| **12** | Component & Deployment Diagrams | 1.0 min | Walk through Figures 4.6 & 4.7, 3-tier topology. |
-| **13** | Entity-Relationship (ER) Diagram & Normalization | 1.0 min | Walk through Figure 4.8, 3NF & BCNF proofs. |
-| **14** | Security Engineering: IDOR Vulnerability Resolution | 1.5 min | Before/After security fix with SecurityUtil. |
-| **15** | Quality Assurance & Testing: 112/112 Verified Tests | 1.0 min | 57 backend, 18 frontend, 36 live API tests. |
-| **16** | Live Demonstration Highlights & Workflows | 1.0 min | 5-stage live demo execution path. |
-| **17** | System Limitations & Future Scope | 0.5 min | Realistic constraints & architectural roadmap. |
-| **18** | Conclusion & Viva Voce Q&A | 0.5 min | Closing statement & invitation for defense questions. |
-| **Total** | **Full Presentation** | **~17.0 min** | **Comprehensive, disciplined academic delivery** |
+| Slide # | Slide Title | Primary Presenter | Duration | Core Academic Focus |
+|:---:|:---|:---:|:---:|:---|
+| **1** | Title Slide & Candidate Introduction | **Student 1** | 1.0 min | Team intro, institution, guide, and project scope. |
+| **2** | Problem Statement & Motivation | **Student 1** | 1.0 min | Fragmentation, manual errors, timetable clashes. |
+| **3** | System Objectives & Scope | **Student 1** | 1.0 min | Role governance, automated state machines, boundary limits. |
+| **4** | Existing vs. Proposed System Comparison | **Student 1** | 1.0 min | Paper/Excel vs unified ACID PostgreSQL + RBAC. |
+| **5** | SDLC Methodology & Phased Plan | **Student 1** | 1.0 min | Iterative Hybrid model justification, Phase 1 & 2 roadmap. |
+| **6** | Software Requirements Specification (SRS) | **Student 1** | 1.0 min | FR-01 to FR-16, NFRs (Security, Performance, Integrity). |
+| **7** | System Architecture & Modern Tech Stack | **Student 2** | 1.0 min | Layered Modular Monolith (React 18 + Spring Boot 3.3.5). |
+| **8** | Use Case Diagram: Actors & Boundaries | **Student 2** | 1.0 min | Admin, Faculty, Student actors and system boundary. |
+| **9** | Class Diagram: Structural Relationships | **Student 2** | 1.5 min | `Person` hierarchy, associations, multiplicity, patterns. |
+| **10** | Four Pillars of OOP in CampusConnect | **Student 2** | 1.5 min | Encapsulation, Inheritance, Abstraction, Polymorphism. |
+| **11** | Object Relationships & GoF Design Patterns| **Student 2** | 1.5 min | Composition, Aggregation, State, Strategy, Builder, Observer. |
+| **12** | Sequence & Activity Diagrams | **Student 2** | 1.0 min | JWT authentication dispatch & Course enrollment flow. |
+| **13** | Database Architecture & ER Diagram | **Student 3** | 1.0 min | 17 normalized tables, 3NF, JPA Joined Inheritance. |
+| **14** | Implementation & Technology Stack | **Student 3** | 1.0 min | Java 21, Spring Security 6.3, JJWT, TypeScript 5.6. |
+| **15** | Main Modules & Role-Based Portals | **Student 3** | 1.0 min | Admin (/admin), Faculty (/faculty), Student (/student). |
+| **16** | Testing & Quality Assurance (100% Pass) | **Student 3** | 1.5 min | 112 empirical tests (57 backend, 18 UI, 36 API), IDOR fixes. |
+| **17** | 3-Member Matrix, Maintenance & Scope | **Student 3** | 1.0 min | Contribution matrix, 4 maintenance types, future roadmap. |
+| **18** | Conclusion & Viva Voce Defense | **All Members** | 1.0 min | Academic summary, deliverables sign-off, viva invitation. |
+| **Total** | **Full Group Presentation** | **3 Members** | **~18.5 min** | **Comprehensive, disciplined academic defense** |
 
 ---
 
-## 2. Slide-by-Slide Speaker Notes & Script
+## 2. Slide-by-Slide Speaker Scripts
 
-### Slide 1: Title Slide
+### Part I: Foundations & Requirements (Presenter: Student Member 1)
+
+#### Slide 1: Title Slide & Introduction
 - **Speaker Script:**  
-  *"Respected members of the evaluation committee, esteemed guide [Faculty Guide Name], and faculty members. Good morning/afternoon. My name is [Student Name], Roll Number [Roll Number]. Today, I am proud to present the design, implementation, and quality assurance audit of my Object-Oriented Methodology project: **CampusConnect — Smart Campus Management System**."*
-- **Key Takeaways to Highlight:** Full-stack enterprise architecture, strict object-oriented design, production-grade empirical verification.
+  *"Respected members of the examination committee, esteemed project guide [Faculty Guide Name], and faculty members. Good morning/afternoon. We are Team CampusConnect, comprising [Student 1 Name], [Student 2 Name], and [Student 3 Name]. Today, we present the analysis, design, implementation, and quality assurance audit of our Object-Oriented Methodology project: **CampusConnect — Smart Campus Management System**."*
 
----
-
-### Slide 2: Executive Summary & Problem Motivation
+#### Slide 2: Problem Statement & Motivation
 - **Speaker Script:**  
-  *"In modern academic institutions, operations are frequently hampered by fragmented record-keeping. Attendance registers, spreadsheet grade sheets, and manual course enrollments create operational delays, human errors, and severe security risks—most notably Insecure Direct Object References (IDOR), where students can view or alter peer data. CampusConnect was engineered to resolve these challenges through clean object-oriented architecture, multi-tiered role-based security, and verifiable data integrity."*
+  *"Contemporary academic institutions often manage operations using fragmented software and spreadsheets. This leads to severe friction: timetable double-booking, enrollment beyond classroom capacity, delayed notification of attendance deficits, and critical security vulnerabilities like Insecure Direct Object References (IDOR). CampusConnect was engineered to solve these challenges using formal Object-Oriented Design principles."*
 
----
-
-### Slide 3: System Objectives & Role Governance Architecture
+#### Slide 3: System Objectives & Scope
 - **Speaker Script:**  
-  *"The system provides three strictly segregated operational portals:*
-  1. *The **Administrator Portal** oversees system-wide governance: user provisioning with BCrypt encryption, department and course structuring, and master timetable scheduling.*
-  2. *The **Faculty Portal** empowers instructors to inspect real-time course rosters, submit daily attendance (Present, Absent, Late, Excused), and enter continuous evaluation grades.*
-  3. *The **Student Portal** enables self-service course registration, real-time academic transcript inspection, and attendance monitoring with proactive low-attendance warnings."*
+  *"Our objectives were twofold: First, create a secure, role-governed platform for Administrators, Faculty, and Students. Second, automate complex academic rules—such as interval-based timetable clash detection, 6-stage enrollment workflows, and plug-and-play grading schemes. Ancillary functions like tuition payments and physical biometric devices were delimited as out-of-scope to focus rigorously on core academic governance."*
 
----
-
-### Slide 4: System Architecture & Modern Technology Stack
+#### Slide 4: Existing vs. Proposed System
 - **Speaker Script:**  
-  *"To guarantee performance, maintainability, and security, CampusConnect utilizes modern, industry-standard technologies:*
-  - *Frontend: React 19 with TypeScript, Tailwind CSS, and Vite, enforcing strict type safety and responsive design.*
-  - *Backend: Java 21 LTS with Spring Boot 3.3.0 and Spring Security 6, organized into a clean 3-Tier Layered Architecture.*
-  - *Persistence: Spring Data JPA and Hibernate with Flyway versioned migrations (V1 through V4), supporting both in-memory H2 for integration testing and PostgreSQL 16 for production deployment.*
-  - *Security: Stateless HMAC-SHA256 JWT tokens with 24-hour expiration."*
+  *"As summarized in our comparison matrix, legacy systems rely on manual coordination with zero auditability. CampusConnect introduces automated validation via state machines, mathematical interval clash detection, and an immutable administrative audit interceptor backed by an ACID-compliant PostgreSQL database."*
 
----
-
-### Slide 5: Object-Oriented Methodology: SOLID Principles & Design Patterns
+#### Slide 5: SDLC Methodology
 - **Speaker Script:**  
-  *"The architecture rigorously adheres to the five SOLID principles:*
-  - *Single Responsibility: For example, `JwtTokenProvider` manages cryptographic token operations, while `SecurityUtil` is solely responsible for caller identity and ownership validation.*
-  - *Open/Closed Principle: Our `Person` domain hierarchy allows new user categories to be introduced without modifying existing authentication filters.*
-  - *Liskov Substitution: Any method accepting `Person` seamlessly accepts `Admin`, `Faculty`, or `Student` instances.*
-  - *Interface Segregation: We use focused Spring Data repositories rather than bloated persistence interfaces.*
-  - *Dependency Inversion: REST Controllers depend on high-level Service Interfaces rather than concrete implementations.*
-  *Furthermore, classic Gang of Four patterns—including the Repository, Service Layer, DTO, Adapter, and Singleton patterns—are embedded throughout the codebase."*
+  *"We adopted an Iterative Hybrid model. Pure Waterfall is too rigid for real academic edge cases, while pure Agile lacks the formal upfront UML documentation required in academic engineering. We structured development into two phases: Phase 1 Core System Delivery, followed by Phase 2 Advanced Patterns (State, Strategy, Observer, Builder), with automated regression testing guarding every milestone."*
 
----
-
-### Slide 6: Domain Modeling: Polymorphic Inheritance Hierarchy
+#### Slide 6: Software Requirements Specification (SRS)
 - **Speaker Script:**  
-  *"At the heart of the domain layer is the abstract `Person` entity, extended into `Admin`, `Faculty`, and `Student`. We chose the `@Inheritance(strategy = InheritanceType.JOINED)` strategy. This ensures that common attributes like email and hashed password reside in a base table, while role-specific attributes—such as `roll_number` for students and `employee_id` for faculty—are stored in dedicated normalized tables without sparse null columns."*
+  *"The system satisfies 16 functional requirements (FR-01 to FR-16) covering authentication, curriculum management, attendance tracking, and grading, supported by 8 non-functional requirements prioritizing sub-200ms response latency, HMAC-SHA512 token security, and strict relational integrity."*
 
 ---
 
-### Slide 7: Use Case Diagram (Figure 4.1)
+### Part II: Architecture, UML & Object-Oriented Design (Presenter: Student Member 2)
+
+#### Slide 7: System Architecture & Modern Tech Stack
 - **Speaker Script:**  
-  *"As depicted in Figure 4.1, the Use Case Diagram models functional boundaries across our actors. Every protected academic action carries an `<<include>>` dependency on Token Verification. The boundary between student self-service and administrative governance is strictly delineated."*
+  *"Thank you, [Student 1]. Moving to system architecture, CampusConnect employs a Layered Modular Monolith. The presentation tier is built with React 18, TypeScript 5.6, and Tailwind CSS. The application tier runs Java 21 LTS with Spring Boot 3.3.5 and Spring Security 6.3. The persistence tier utilizes PostgreSQL 16 with Flyway versioned migrations."*
 
----
-
-### Slide 8: Class Diagram (Figure 4.2)
+#### Slide 8: Use Case Diagram
 - **Speaker Script:**  
-  *"Figure 4.2 shows our structural Class Diagram. Notice the joined inheritance from `Person`, the 1-to-N aggregation between `Department` and `Course`, and the associative `Enrollment` entity connecting `Student` and `Course`. Controllers depend strictly on Service interfaces, completely isolating web concerns from persistence logic."*
+  *"Our Use Case Diagram defines three primary actors: Administrator, Faculty, and Student. Administrators manage institutional master catalogs and timetable allocations. Faculty record attendance sessions and continuous assessment grades. Students register for courses, monitor attendance deficits, and view academic transcripts."*
 
----
-
-### Slide 9: Sequence Diagram: Authentication Flow (Figure 4.3)
+#### Slide 9: Class Diagram & Structural Architecture
 - **Speaker Script:**  
-  *"Figure 4.3 illustrates the dynamic runtime interaction during user login and protected dispatch. When the client submits credentials, `AuthController` delegates to Spring's `AuthenticationManager`. Upon successful BCrypt hash verification, `JwtTokenProvider` generates a cryptographically signed token. Subsequent requests pass through `JwtAuthenticationFilter`, which verifies the HMAC signature and populates the `SecurityContext`."*
+  *"Our domain model centers on the abstract base class `Person`, extended polymorphically by `Student`, `Faculty`, and `Admin`. The class diagram faithfully maps the Java entity model: `Department` aggregates `Course` and `Faculty`, while `Course` strongly composes `AssessmentComponent`, ensuring cascaded deletion lifecycle rules."*
 
----
-
-### Slide 10: Activity Diagram: Course Enrollment Workflow (Figure 4.4)
+#### Slide 10: Four Pillars of OOP in CampusConnect
 - **Speaker Script:**  
-  *"Figure 4.4 visualizes the algorithmic control flow of student course enrollment. Decision nodes evaluate course active status, duplicate registrations, and seat capacity. Successful requests transition into a provisional `PENDING` state within an isolated database transaction, awaiting administrative approval."*
+  *"We have rigorously implemented all four OOP pillars:*
+  1. *Encapsulation: Fields are private; `Student.promoteToNextSemester()` enforces semester limits (1–12).*
+  2. *Inheritance: `Person` hierarchy utilizes JPA `@Inheritance(strategy = InheritanceType.JOINED)`.*
+  3. *Abstraction: `Person` is abstract; `GradingStrategy` abstracts calculation logic.*
+  4. *Polymorphism: Dynamic method dispatch in strategy evaluation and enrollment state transitions."*
 
----
-
-### Slide 11: State Machine: Academic Enrollment Lifecycle (Figure 4.5)
+#### Slide 11: Object Relationships & GoF Design Patterns
 - **Speaker Script:**  
-  *"Figure 4.5 maps the discrete states of an `Enrollment` instance. An enrollment begins in `PENDING`. Upon administrative approval, it transitions to `ACTIVE`, which unlocks attendance and grading workflows. When the semester concludes, it transitions to `COMPLETED`, permanently locking the earned credits and grade points into the transcript."*
+  *"Beyond the four pillars, we implemented five GoF design patterns:*
+  - *State Pattern: 6-state enrollment lifecycle (`DraftState`, `SubmittedState`, `ApprovedState`, `EnrolledState`, etc.).*
+  - *Strategy Pattern: `AbsoluteGradingStrategy` (fixed scale) and `RelativeGradingStrategy` (Gaussian curve).*
+  - *Builder Pattern: `TranscriptDirector` and `TranscriptBuilder` assembling official transcripts.*
+  - *Observer Pattern: `AcademicEventListener` dispatching persistent notifications on grade publication.*
+  - *Factory Pattern: Centralized instantiation via `GradingStrategyFactory`."*
 
----
-
-### Slide 12: Component & Deployment Topology (Figures 4.6 & 4.7)
+#### Slide 12: Sequence & Activity Diagrams
 - **Speaker Script:**  
-  *"Figures 4.6 and 4.7 demonstrate our physical and logical deployment architecture. The React SPA communicates over TLS HTTPS with the Spring Boot container. HikariCP connection pooling maintains resilient JDBC sessions to the PostgreSQL database cluster over Port 5432."*
+  *"Our Sequence Diagram traces the JWT authentication lifecycle from React submission through Spring Security filters to token issuance. Our Activity Diagram illustrates the course enrollment flow, showing decision points for prerequisite verification and seat capacity availability."*
 
 ---
 
-### Slide 13: Relational Persistence & Normalization (Figure 4.8)
+### Part III: Persistence, Implementation & Quality Assurance (Presenter: Student Member 3)
+
+#### Slide 13: Relational Persistence & ER Model
 - **Speaker Script:**  
-  *"Figure 4.8 presents our Entity-Relationship model comprising 11 relational tables. The schema satisfies Third Normal Form (3NF) and Boyce-Codd Normal Form (BCNF). Transitive dependencies are eliminated through foreign key references, and surrogate primary keys prevent partial key dependencies."*
+  *"Thank you, [Student 2]. Turning to data persistence, our database comprises 17 relational tables normalized to Third Normal Form (3NF). We utilize JPA Joined Inheritance, where common columns reside in `persons`, while specialized columns live in `students`, `faculty`, and `admins` joined on primary key `id`. Referential integrity is enforced through foreign keys and composite indexes."*
 
----
-
-### Slide 14: Security Engineering & IDOR Vulnerability Resolution
+#### Slide 14: Implementation Details
 - **Speaker Script:**  
-  *"During our security audit, we identified three critical Insecure Direct Object Reference (IDOR) vulnerabilities on enrollment, attendance, and grade endpoints where client-supplied `studentId` path parameters were trusted.  
-  We resolved this by implementing defense-in-depth ownership verification inside `SecurityUtil`. The system resolves the caller's identity directly from the signed JWT principal. If a student attempts to access another student's record, the request is immediately terminated with HTTP 403 Forbidden. Faculty access is similarly restricted to students actively enrolled in sections they teach."*
+  *"In our implementation, Java 21 features—such as records for immutable event DTOs and pattern matching—work alongside Spring Security's stateless filter chain. On the frontend, Axios interceptors inject JWT tokens and handle session expirations, while TypeScript interfaces mirror backend DTO contracts to eliminate serialization errors."*
 
----
-
-### Slide 15: Quality Assurance & Testing: 112/112 Verified Tests
+#### Slide 15: Main Modules & Role-Based Portals
 - **Speaker Script:**  
-  *"Our testing audit validated the application across three tiers:
-  - 57 backend unit and integration tests (JUnit 5 & Mockito)
-  - 18 frontend component tests (Jest & React Testing Library)
-  - 36 live API integration tests verifying all endpoints and security constraints
-  Total: 112 out of 112 tests passed with a 100% success rate, confirming zero regressions."*
+  *"The platform hosts three role-based portals: `/admin` for master curriculum, timetable conflict checking, and audit trails; `/faculty` for attendance sessions and modular score entry; and `/student` for self-service course registration and official transcript generation."*
 
----
-
-### Slide 16: Live Demonstration Highlights
+#### Slide 16: Testing & Quality Assurance
 - **Speaker Script:**  
-  *"In our live system demonstration, we execute five key workflows: multi-role authentication with dynamic navigation rendering, department and course provisioning, student course enrollment with administrative approval, faculty attendance entry, and finally, a live security demonstration proving that parameter tampering triggers HTTP 403 Forbidden."*
+  *"Quality assurance was executed through automated multi-tier testing: 57 backend tests in JUnit 5 and Mockito, 18 frontend tests in Vitest and React Testing Library, and 36 live API security tests, yielding a 100% pass rate across 112 tests. Furthermore, we audited and resolved 8 specific defects, including critical IDOR vulnerabilities in enrollment and attendance endpoints."*
 
----
-
-### Slide 17: Limitations & Future Architectural Roadmap
+#### Slide 17: Team Contribution Matrix & Maintenance
 - **Speaker Script:**  
-  *"While the core academic governance engine is fully operational, we have identified future enhancements: incorporating payment gateways like Razorpay for automated tuition receipts, integrating IoT biometric scanners for classroom attendance, and developing React Native mobile applications."*
+  *"Our team shared balanced responsibilities:*
+  - *[Student 1]: Core architecture, Spring Security, JWT, Strategy Pattern, Audit logging.*
+  - *[Student 2]: React frontend, UI state guards, State Pattern, Timetable UI, Presentation Guide.*
+  - *[Student 3]: PostgreSQL schema, JPA entity mapping, Builder Pattern, Testing Suite & QA audit.*
+  *Our maintenance model encompasses corrective bug fixes, adaptive library upgrades, perfective grading enhancements, and preventive static analysis."*
+
+#### Slide 18: Conclusion & Viva Voce
+- **Speaker Script (Delivered jointly):**  
+  *"In conclusion, CampusConnect successfully delivers a production-ready, full-stack campus management platform adhering strictly to Object-Oriented Methodology and software engineering best practices. We thank the evaluation committee and welcome your questions and live demonstration requests."*
 
 ---
 
-### Slide 18: Conclusion & Viva Voce Q&A
-- **Speaker Script:**  
-  *"In conclusion, CampusConnect demonstrates the power of Object-Oriented Methodology in engineering complex, secure, and maintainable enterprise software. Thank you for your time and consideration. I now warmly invite your questions and feedback for the Viva Voce evaluation."*
+## 3. Anticipated Viva Voce Questions & Answers
 
----
+### For Student Member 1 (Architecture & Security Focus):
+1. **Q: Why did you choose JPA JOINED inheritance over SINGLE_TABLE?**  
+   *A:* `JOINED` normalizes the database schema into distinct tables (`persons`, `students`, `faculty`, `admins`) joined by primary key `id`. It eliminates nullable columns, enforces relational integrity, and directly mirrors the OOP *is-a* relationship.
+2. **Q: How does the Strategy pattern achieve the Open/Closed Principle?**  
+   *A:* New grading schemes (e.g. Pass/Fail or standard deviation curves) can be added by implementing the `GradingStrategy` interface without altering `GradeServiceImpl` or existing strategy classes.
 
-## 3. Anticipated Viva Voce / Defense Questions & Model Answers
+### For Student Member 2 (Design Patterns & UI Focus):
+1. **Q: How does the State pattern prevent invalid enrollment status transitions?**  
+   *A:* Each state is an object implementing `EnrollmentState`. Illegal transitions (e.g., calling `approve()` on an already `DROPPED` enrollment) throw `IllegalStateException` inside `AbstractEnrollmentState`, removing brittle `if-else` conditionals.
+2. **Q: Where is runtime polymorphism demonstrated?**  
+   *A:* When calling `strategy.evaluate()` or `state.approve()`, Java resolves the method call dynamically at runtime based on the actual concrete object injected, executing class-specific behavior.
 
-### Q1: Why did you choose JPA Joined Inheritance (`InheritanceType.JOINED`) over Single Table or Table Per Class?
-- **Model Answer:**  
-  *"We chose `InheritanceType.JOINED` because it maintains strict 3NF database normalization. `SINGLE_TABLE` would require sparse columns with null values (e.g. `roll_number` null for faculty, `employee_id` null for students) and prevents database-level NOT NULL constraints. `TABLE_PER_CLASS` causes schema duplication and inefficient polymorphic queries with UNIONs. JOINED keeps shared attributes in `persons` and specialized attributes in child tables joined by primary key."*
-
-### Q2: How did you fix the IDOR vulnerability, and why didn't you just hide the studentId in the frontend?
-- **Model Answer:**  
-  *"Hiding UI elements or parameters in the frontend is 'security through obscurity' and provides zero defense against malicious requests sent via cURL or Postman. We fixed IDOR at the backend service layer using `SecurityUtil`. The backend extracts the authenticated user's email directly from the cryptographically signed JWT token in `SecurityContextHolder`, resolves the caller's database record, and verifies ownership. If `callerStudentId != targetStudentId`, Spring Security immediately throws an `AccessDeniedException` returning HTTP 403 Forbidden."*
-
-### Q3: What is the purpose of Data Transfer Objects (DTOs), and why not return JPA Entities directly to the React frontend?
-- **Model Answer:**  
-  *"Directly exposing JPA Entities causes three major issues:  
-  1. Security leaks: Sensitive fields like password hashes or internal audit fields could be serialized into JSON.  
-  2. Circular reference exceptions during Jackson JSON serialization (e.g., Student -> Enrollment -> Student infinite recursion).  
-  3. Tight coupling: Database schema changes would immediately break the frontend API contract.  
-  DTOs act as clean boundary objects that encapsulate only the exact data required by the presentation layer."*
-
-### Q4: How does your system handle timetable scheduling conflicts?
-- **Model Answer:**  
-  *"In `TimetableService`, before saving a lecture slot, the system validates two invariants: first, `startTime` must be strictly before `endTime`. Second, it queries `TimetableRepository` to ensure neither the assigned faculty member nor the specified lecture hall (`roomNumber`) has an overlapping lecture slot on the same day of the week."*
-
-### Q5: What is the difference between Authentication and Authorization in CampusConnect?
-- **Model Answer:**  
-  *"Authentication verifies identity—confirming who the user is using BCrypt salted password hashing and issuing a signed JWT token. Authorization verifies permissions—determining what an authenticated user is permitted to do based on their assigned role (ADMIN, FACULTY, STUDENT) and resource ownership rules enforced by Spring Security's `@PreAuthorize` and `SecurityUtil`."*
+### For Student Member 3 (Database, Testing & Builder Focus):
+1. **Q: Why use the Builder pattern for transcripts instead of a standard constructor?**  
+   *A:* Transcripts are complex composite documents with student metadata, multiple semester courses, cumulative GPA calculations, and security signatures. The Builder pattern constructs this step-by-step through a director without telescoping constructors.
+2. **Q: How were IDOR vulnerabilities resolved during testing?**  
+   *A:* In `EnrollmentController` and `AttendanceController`, we introduced caller verification where the authenticated JWT principal is checked against the target student ID. Non-owners and unauthorized faculty receive HTTP 403 Forbidden.

@@ -1,0 +1,721 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{a4paper, left=1.25in, right=1.0in, top=1.0in, bottom=1.0in}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{bookmark}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{amsmath,amssymb}
+
+% --- Colors ---
+\definecolor{primarynavy}{RGB}{15,23,42}
+\definecolor{accentindigo}{RGB}{79,70,229}
+\definecolor{codegray}{RGB}{245,247,250}
+\definecolor{codeborder}{RGB}{203,213,225}
+\definecolor{darkslate}{RGB}{30,41,59}
+
+% --- Hyperref Setup ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=accentindigo,
+    citecolor=primarynavy,
+    urlcolor=accentindigo,
+    pdftitle={CampusConnect — Smart Campus Management System (OOM Project Report)},
+    pdfauthor={Student 1, Student 2, Student 3}
+}
+
+% --- Listings Setup for Java ---
+\lstset{
+    language=Java,
+    backgroundcolor=\color{codegray},
+    basicstyle=\ttfamily\footnotesize\color{darkslate},
+    keywordstyle=\bfseries\color{accentindigo},
+    commentstyle=\itshape\color{gray},
+    stringstyle=\color{primarynavy},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    tabsize=4,
+    showspaces=false,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{codeborder},
+    captionpos=b
+}
+
+% --- Header and Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{gray}CampusConnect — Smart Campus Management System}
+\fancyhead[R]{\small\color{gray}OOM Major Project Report}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% --- Chapter Titles ---
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries\color{primarynavy}}{\chaptertitlename\ \thechapter}{14pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
+\begin{document}
+
+% ==========================================
+% PRELIMINARY PAGES
+% ==========================================
+\pagenumbering{roman}
+
+% --- Cover Page ---
+\begin{titlepage}
+\begin{center}
+    \vspace*{0.5cm}
+    {\Huge \textbf{\color{primarynavy}CampusConnect}}\\[0.3cm]
+    {\LARGE \textbf{\color{accentindigo}Smart Campus Management System}}\\[0.4cm]
+    {\large \textit{A Full-Stack Academic Governance Platform Engineered with Object-Oriented Methodology (OOM)}}\\[1.5cm]
+
+    \textbf{A MAJOR PROJECT REPORT}\\[0.3cm]
+    \textit{Submitted in partial fulfillment of the requirements for the award of the degree of}\\[0.3cm]
+    \textbf{BACHELOR OF TECHNOLOGY}\\[0.2cm]
+    \textit{in}\\[0.2cm]
+    \textbf{COMPUTER SCIENCE AND ENGINEERING}\\[1.2cm]
+
+    \textit{Submitted by:}\\[0.3cm]
+    \begin{table}[h!]
+    \centering
+    \begin{tabular}{lll}
+        \textbf{[Student 1 Name]} & \quad Roll No: \textbf{[Roll Number 1]} & \quad (Lead Architecture \& Security) \\
+        \textbf{[Student 2 Name]} & \quad Roll No: \textbf{[Roll Number 2]} & \quad (Frontend \& State Patterns) \\
+        \textbf{[Student 3 Name]} & \quad Roll No: \textbf{[Roll Number 3]} & \quad (Database, QA \& Testing) \\
+    \end{tabular}
+    \end{table}
+
+    \vspace{0.8cm}
+    \textit{Under the Supervision of:}\\[0.2cm]
+    \textbf{[Faculty Guide Name]}\\[0.1cm]
+    \textit{[Designation, Department of Computer Science and Engineering]}\\[1.2cm]
+
+    \textbf{DEPARTMENT OF COMPUTER SCIENCE AND ENGINEERING}\\[0.2cm]
+    \textbf{[UNIVERSITY / INSTITUTION NAME]}\\[0.1cm]
+    \textbf{[Campus / City, State, India]}\\[0.3cm]
+    \textbf{Academic Year: 2026--2027}
+\end{center}
+\end{titlepage}
+
+% --- Certificate ---
+\newpage
+\chapter*{Certificate of Originality}
+\addcontentsline{toc}{chapter}{Certificate of Originality}
+This is to certify that the project entitled \textbf{``CampusConnect --- Smart Campus Management System''} submitted by \textbf{[Student 1 Name]} (Roll No: \textbf{[Roll Number 1]}), \textbf{[Student 2 Name]} (Roll No: \textbf{[Roll Number 2]}), and \textbf{[Student 3 Name]} (Roll No: \textbf{[Roll Number 3]}) in partial fulfillment of the requirements for the award of the degree of \textbf{Bachelor of Technology in Computer Science and Engineering} at \textbf{[UNIVERSITY / INSTITUTION NAME]}, is an authentic record of bonafide academic work carried out under my supervision and guidance during the academic session 2026--2027.\\[0.5cm]
+The results presented in this report have been verified through automated test suites (112 test cases) and live software execution, and have not been submitted to any other university or institute for the award of any degree or diploma.\\[2.0cm]
+
+\noindent
+\begin{minipage}{0.48\textwidth}
+    \rule{6cm}{0.4pt}\\
+    \textbf{[Faculty Guide Name]}\\
+    Project Supervisor / Guide\\
+    Department of CSE\\
+    [University / Institution Name]
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \flushright
+    \rule{6cm}{0.4pt}\\
+    \textbf{[Head of Department]}\\
+    Head of the Department\\
+    Department of CSE\\
+    [University / Institution Name]
+\end{minipage}
+
+% --- Declaration ---
+\newpage
+\chapter*{Candidate Declaration}
+\addcontentsline{toc}{chapter}{Candidate Declaration}
+We, the undersigned students of the Department of Computer Science and Engineering at \textbf{[UNIVERSITY / INSTITUTION NAME]}, hereby declare that the major project report entitled \textbf{``CampusConnect --- Smart Campus Management System''} is an authentic presentation of our own original engineering work conducted under the guidance of \textbf{[Faculty Guide Name]}.\\[0.5cm]
+We confirm that:
+\begin{enumerate}
+    \item The code, design patterns, UML diagrams, test suites, and database schemas documented herein represent our actual technical work.
+    \item Appropriate citations and references are provided wherever existing libraries, frameworks, or concepts have been utilized.
+    \item The project does not contain plagiarized text or fabricated empirical verification results.
+\end{enumerate}
+
+\vspace{1.5cm}
+\noindent
+\begin{tabular}{lll}
+    \rule{4.5cm}{0.4pt} & \rule{4.5cm}{0.4pt} & \rule{4.5cm}{0.4pt} \\
+    \textbf{[Student 1 Name]} & \textbf{[Student 2 Name]} & \textbf{[Student 3 Name]} \\
+    Roll: [Roll Number 1] & Roll: [Roll Number 2] & Roll: [Roll Number 3] \\
+    Date: [Submission Date] & Date: [Submission Date] & Date: [Submission Date] \\
+\end{tabular}
+
+% --- Acknowledgement ---
+\newpage
+\chapter*{Acknowledgement}
+\addcontentsline{toc}{chapter}{Acknowledgement}
+We express our deepest gratitude to our respected project supervisor, \textbf{[Faculty Guide Name]}, for invaluable intellectual guidance, continuous constructive criticism, and encouragement throughout the design and development of \textbf{CampusConnect}.\\[0.4cm]
+We extend our sincere thanks to \textbf{[Head of Department]}, Head of the Department of Computer Science and Engineering, for providing the necessary infrastructural resources, computing laboratories, and academic support.\\[0.4cm]
+We also appreciate the support of the faculty members and technical staff of the department whose insights helped refine our Object-Oriented design patterns, database architecture, and security protocols.\\[0.4cm]
+Finally, we thank our parents, families, and student peers whose patience, encouragement, and collaborative discussions made the successful realization of this group project possible.\\[1.0cm]
+\textbf{[Student 1 Name]}, \textbf{[Student 2 Name]}, and \textbf{[Student 3 Name]}
+
+% --- Abstract ---
+\newpage
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+In contemporary higher education institutions, fragmented software tools, disparate physical ledgers, and standalone spreadsheets lead to operational bottlenecks, scheduling clashes, unverified course prerequisite flows, and critical security vulnerabilities. This project presents \textbf{CampusConnect}, an enterprise-grade Smart Campus Academic Management System engineered strictly around modern \textbf{Object-Oriented Methodology (OOM)} principles, \textbf{SOLID} design axioms, and classic \textbf{Gang of Four (GoF)} software design patterns.\\[0.4cm]
+CampusConnect consolidates institutional governance into three securely isolated operational portals: Administrator, Faculty, and Student. The system is architected as a high-performance Layered Modular Monolith with a \textbf{Java 21 LTS} and \textbf{Spring Boot 3.3.5} backend, a \textbf{React 18.3} and \textbf{TypeScript 5.6} frontend, and an ACID-compliant \textbf{PostgreSQL 16} relational database with Flyway version-controlled migrations.\\[0.4cm]
+Key architectural achievements include:
+\begin{itemize}
+    \item \textbf{Polymorphic Domain Modeling:} JPA Joined-Table Inheritance mapping generalized \texttt{Person} entities to specialized \texttt{Student}, \texttt{Faculty}, and \texttt{Admin} roles without attribute duplication.
+    \item \textbf{GoF State Pattern:} Enforcing a strict 6-stage course enrollment lifecycle (\texttt{DRAFT} $\to$ \texttt{SUBMITTED} $\to$ \texttt{APPROVED} $\to$ \texttt{ENROLLED}, \texttt{DROPPED}, \texttt{REJECTED}), eliminating conditional anti-patterns.
+    \item \textbf{GoF Strategy Pattern:} Modularizing grading evaluation into interchangeable strategies: \texttt{AbsoluteGradingStrategy} (criterion thresholds) and \texttt{RelativeGradingStrategy} (Gaussian bell curve distribution).
+    \item \textbf{GoF Builder Pattern:} Step-by-step assembly of credentialed, multi-part academic transcript reports via \texttt{TranscriptDirector} and \texttt{ConcreteTranscriptBuilder}.
+    \item \textbf{GoF Observer Pattern:} Asynchronous event-driven notification dispatch via \texttt{AcademicEventListener} capturing domain events (\texttt{GradePublishedEvent}, \texttt{AttendanceShortageEvent}).
+    \item \textbf{Algorithmic Collision Detection:} Interval intersection validation preventing room, course, and instructor timetable conflicts.
+    \item \textbf{Empirical Quality Assurance:} 100\% test pass rate across 112 automated test cases (57 backend JUnit 5 tests, 18 frontend Vitest tests, and 36 live API security tests) with zero open defects.
+\end{itemize}
+
+% --- Contents and Lists ---
+\newpage
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+
+% ==========================================
+% CHAPTER 1: INTRODUCTION
+% ==========================================
+\newpage
+\pagenumbering{arabic}
+\chapter{Introduction}
+
+\section{Background and Context}
+Higher education institutions operate complex academic ecosystems comprising diverse departments, multidisciplinary curricula, extensive student bodies, and shared physical infrastructure. Traditionally, universities managed these operations through manual paper registers or decentralized desktop spreadsheets. As student enrollment scales and interdisciplinary elective courses proliferate, decentralized administration inevitably collapses under data inconsistency, administrative latency, and scheduling collisions.
+
+\section{Problem Statement}
+Existing campus management approaches suffer from five structural deficiencies:
+\begin{enumerate}
+    \item \textbf{Data Silos and Redundancy:} Student identity, departmental affiliations, and course registrations are duplicated across disparate files, causing synchronization failures.
+    \item \textbf{Unenforced Enrollment Invariants:} Course enrollment is frequently conducted without real-time prerequisite verification, credit-limit checks, or seat capacity constraints.
+    \item \textbf{Timetable Scheduling Conflicts:} Lack of mathematical interval checking leads to classroom double-booking and faculty timetable overlaps.
+    \item \textbf{Rigid Evaluation Mechanisms:} Grade processing tools are locked into static formulas, preventing academic departments from dynamically adopting relative Gaussian curve grading.
+    \item \textbf{Insecure Direct Object Reference (IDOR):} Primitive web applications expose raw database identifiers, enabling unauthorized students to inspect or alter peer attendance and grade records.
+\end{enumerate}
+
+\section{Project Objectives}
+The primary objective of \textbf{CampusConnect} is to deliver a robust, full-stack, enterprise-grade academic management portal governed by rigorous Object-Oriented Methodology:
+\begin{itemize}
+    \item Unify institutional governance across three role-segregated portals: Administrator, Faculty, and Student.
+    \item Formalize the course registration workflow into an automated State Machine.
+    \item Implement mathematical interval clash detection for classrooms, instructors, and student cohorts.
+    \item Provide plug-and-play grading schemes using the GoF Strategy Pattern.
+    \item Enforce stateless cryptographic JSON Web Token (JWT) authentication and role-based access control (RBAC).
+\end{itemize}
+
+\section{Project Scope and Boundary Delimitations}
+\textbf{In-Scope:}
+Department management, faculty/student provisioning, course catalog configuration, classroom inventory, timetable conflict resolution, 6-state enrollment workflow, attendance logging with shortage alerts, modular continuous assessment, absolute and relative grading, academic transcript generation, immutable audit logging, and responsive web portals.
+
+\noindent
+\textbf{Out-of-Scope (Delimitations):}
+Physical hardware installation (e.g., RFID biometric scanners), commercial payment gateway processing for tuition fees, and hostel/mess auxiliary allocations.
+
+\section{Motivation and Expected Impact}
+By consolidating all academic workflows into an object-oriented, transactional architecture, CampusConnect eliminates administrative paperwork, guarantees zero scheduling clashes, provides continuous visibility into student attendance and performance, and demonstrates production-grade software engineering best practices.
+
+% ==========================================
+% CHAPTER 2: SOFTWARE REQUIREMENTS SPECIFICATION
+% ==========================================
+\chapter{Software Requirements Specification (SRS)}
+
+\section{System Actors}
+\begin{itemize}
+    \item \textbf{Administrator:} Institutional registrar managing departments, faculty/student accounts, course offerings, classrooms, master timetables, and audit logs.
+    \item \textbf{Faculty:} Instructional staff conducting courses, scheduling attendance sessions, entering assessment marks, and selecting grading strategies.
+    \item \textbf{Student:} Enrolled learners discovering courses, submitting registration applications, monitoring class timetables, and inspecting transcripts.
+\end{itemize}
+
+\section{Functional Requirements (FR-01 to FR-16)}
+\begin{longtable}{p{0.15\textwidth}p{0.3\textwidth}p{0.45\textwidth}}
+\toprule
+\textbf{Req ID} & \textbf{Requirement Title} & \textbf{Functional Specification} \\
+\midrule
+\endhead
+FR-01 & User Authentication & Authenticate campus actors using username and password; issue stateless HMAC-SHA512 JWTs. \\
+FR-02 & Role-Based Dispatch & Direct authenticated users to role-specific dashboards (\texttt{/admin}, \texttt{/faculty}, \texttt{/student}). \\
+FR-03 & Password Security & Store passwords using BCrypt one-way hashing with cryptographic salt rounds. \\
+FR-04 & Department CRUD & Allow administrators to create, read, update, and inspect academic departments. \\
+FR-05 & Faculty Provisioning & Manage faculty profiles (name, email, phone, employee code, designation, department). \\
+FR-06 & Student Provisioning & Register students with unique roll numbers, department mappings, and semester levels. \\
+FR-07 & Course Management & Create course offerings specifying code, title, credits, semester, and seat capacity. \\
+FR-08 & Instructor Assignment & Assign qualified faculty members to scheduled courses. \\
+FR-09 & Course Enrollment & Allow eligible students to initiate course enrollment in \texttt{DRAFT} status. \\
+FR-10 & Enrollment Workflow & Transition applications through \texttt{SUBMITTED}, \texttt{APPROVED}, \texttt{ENROLLED}, \texttt{DROPPED}, or \texttt{REJECTED}. \\
+FR-11 & Attendance Logging & Enable faculty to log session attendance records (\texttt{PRESENT}, \texttt{ABSENT}, \texttt{LATE}, \texttt{EXCUSED}). \\
+FR-12 & Attendance Monitoring & Calculate subject-wise attendance percentages; trigger alerts when attendance $< 75\%$. \\
+FR-13 & Assessment Grading & Record continuous assessment scores across Midterm, Final, and Assignment components. \\
+FR-14 & Strategy Evaluation & Dynamically compute grades via Absolute criteria or Relative Gaussian distributions. \\
+FR-15 & Timetable Scheduling & Schedule weekly course slots; reject allocations overlapping room or instructor schedules. \\
+FR-16 & Audit Trail Logging & Intercept and record administrative actions (action, entity, user, timestamp, IP) immutably. \\
+\bottomrule
+\end{longtable}
+
+\section{Non-Functional Requirements (NFR-01 to NFR-08)}
+\begin{itemize}
+    \item \textbf{NFR-01 (Security):} Stateless JWT authentication with 24-hour expiration; strict RBAC route guards; parameter ownership checks preventing IDOR.
+    \item \textbf{NFR-02 (Performance):} 95th percentile API response time $< 200$\,ms under concurrent load; database query optimization via composite B-Tree indexes.
+    \item \textbf{NFR-03 (Data Integrity):} Enforce relational foreign keys, unique constraints on roll numbers/emails, and atomic database transactions (\texttt{@Transactional}).
+    \item \textbf{NFR-04 (Maintainability):} Strict adherence to SOLID principles, layered modular packaging, and comprehensive automated test suites.
+    \item \textbf{NFR-05 (Usability):} Responsive web interface accessible across desktop, tablet, and mobile displays with WCAG AA compliant contrast.
+    \item \textbf{NFR-06 (Reliability):} Robust global exception handling returning standardized RFC 7807 problem details without leaking internal stack traces.
+    \item \textbf{NFR-07 (Auditability):} Non-repudiable audit logging preserving immutable administrative change histories.
+    \item \textbf{NFR-08 (Portability):} Containerized deployment via Docker Compose supporting PostgreSQL 16 on Linux, macOS, and Windows.
+\end{itemize}
+
+% ==========================================
+% CHAPTER 3: REQUIREMENT ANALYSIS
+% ==========================================
+\chapter{Requirement Analysis}
+
+\section{Stakeholder Analysis}
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{p{0.2\textwidth}p{0.3\textwidth}p{0.4\textwidth}}
+\toprule
+\textbf{Stakeholder} & \textbf{Organizational Role} & \textbf{Core Value Proposition} \\
+\midrule
+Academic Dean / Registrar & Institutional Leadership & High-level institutional analytics, capacity utilization, compliance audit trails. \\
+Department Heads & Academic Administration & Course planning, faculty teaching allocations, curriculum scheduling. \\
+Faculty Members & Teaching Staff & Frictionless attendance logging, automated GPA calculations, class rosters. \\
+Students & Learners & Transparent course discovery, conflict-free schedules, real-time grades. \\
+Campus IT Staff & Systems Operations & Stateless micro-monolith, automated migrations, zero schema drift. \\
+\bottomrule
+\end{tabular}
+\caption{Stakeholder Matrix and Value Alignment}
+\end{table}
+
+\section{Detailed Use-Case Specifications}
+\subsection{Use Case UC-10: Course Enrollment Application}
+\begin{itemize}
+    \item \textbf{Primary Actor:} Student
+    \item \textbf{Pre-conditions:} Student is authenticated with active account status; target course has available seats ($enrolledCount < capacity$).
+    \item \textbf{Trigger:} Student clicks ``Enroll'' on an available course offering.
+    \item \textbf{Main Success Scenario:}
+    \begin{enumerate}
+        \item Student browses available courses matching their department and semester.
+        \item System validates that student is not already enrolled or pending approval in the course.
+        \item System creates an \texttt{Enrollment} entity in \texttt{DRAFT} state.
+        \item Student confirms application, triggering transition to \texttt{SUBMITTED} state.
+        \item System notifies assigned instructor and registrar.
+    \end{enumerate}
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item \textit{Capacity Reached:} If $enrolledCount \ge capacity$, system rejects submission with ``Course section is at maximum capacity''.
+        \item \textit{Duplicate Application:} If student has existing enrollment, system blocks submission with ``Duplicate enrollment detected''.
+    \end{itemize}
+\end{itemize}
+
+% ==========================================
+% CHAPTER 4: OBJECT-ORIENTED ANALYSIS
+% ==========================================
+\chapter{Object-Oriented Analysis}
+
+\section{Classes, Responsibilities, and Collaborators (CRC Model)}
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{p{0.25\textwidth}p{0.35\textwidth}p{0.3\textwidth}}
+\toprule
+\textbf{Class Name} & \textbf{Core Responsibilities} & \textbf{Collaborators} \\
+\midrule
+\texttt{Person} & Maintains identity, contact info, account status invariants. & Subclasses (\texttt{Student}, \texttt{Faculty}, \texttt{Admin}). \\
+\texttt{Student} & Enforces semester boundaries; tracks enrollments. & \texttt{Department}, \texttt{Enrollment}. \\
+\texttt{Faculty} & Identifies instructor; manages course sessions. & \texttt{Department}, \texttt{Course}. \\
+\texttt{Course} & Manages credits, capacity, and assessment structure. & \texttt{Department}, \texttt{Faculty}, \texttt{AssessmentComponent}. \\
+\texttt{Enrollment} & Encapsulates student registration state transitions. & \texttt{Student}, \texttt{Course}, \texttt{EnrollmentState}. \\
+\texttt{TimetableEntry} & Validates room, instructor, and temporal intervals. & \texttt{Course}, \texttt{Classroom}, \texttt{Faculty}. \\
+\bottomrule
+\end{tabular}
+\caption{CRC Card Mapping of Key Domain Entities}
+\end{table}
+
+\section{Domain Object Interaction Model}
+Domain interactions operate through strict encapsulation boundaries:
+\begin{enumerate}
+    \item High-level service objects receive Data Transfer Objects (DTOs) from controllers.
+    \item Services fetch domain aggregate roots from JPA Repositories.
+    \item Business mutators are executed directly on domain entities, ensuring entity-level validation invariants are never bypassed.
+    \item Repositories persist updated state within managed database transactions.
+\end{enumerate}
+
+% ==========================================
+% CHAPTER 5: OOP CONCEPTS USED
+% ==========================================
+\chapter{OOP Concepts Used in CampusConnect}
+
+\section{The Four Pillars of Object-Oriented Programming}
+
+\subsection{1. Encapsulation}
+\textbf{Definition:} Encapsulation is the bundling of data and the methods that operate on that data into a single unit, restricting direct external access to internal state representations.\\[0.2cm]
+\textbf{Implementation Class:} \texttt{Student.java} (\texttt{backend/src/main/java/com/campusconnect/entity/Student.java})\\[0.2cm]
+\textbf{Code Snippet:}
+\begin{lstlisting}
+public class Student extends Person {
+    @Column(name = "roll_number", nullable = false, unique = true)
+    private String rollNumber;
+
+    @Column(nullable = false)
+    private int semester = 1;
+
+    public void promoteToNextSemester() {
+        if (this.semester >= 12) {
+            throw new IllegalStateException("Student has already reached maximum academic semester (12).");
+        }
+        this.semester++;
+    }
+
+    public void setSemester(int semester) {
+        if (semester < 1 || semester > 12) {
+            throw new IllegalArgumentException("Semester must be between 1 and 12. Provided: " + semester);
+        }
+        this.semester = semester;
+    }
+}
+\end{lstlisting}
+\textbf{Architectural Justification:} The internal field \texttt{semester} cannot be set to arbitrary or negative numbers. External callers must invoke \texttt{promoteToNextSemester()} or \texttt{setSemester()}, which enforce strict academic domain boundaries.
+
+\subsection{2. Inheritance}
+\textbf{Definition:} Inheritance allows a specialized class to inherit attributes and behaviors from a generalized superclass, creating an \textit{is-a} conceptual hierarchy.\\[0.2cm]
+\textbf{Implementation Class:} \texttt{Person.java} $\to$ \texttt{Student.java}, \texttt{Faculty.java}, \texttt{Admin.java}\\[0.2cm]
+\textbf{Code Snippet:}
+\begin{lstlisting}
+@Entity
+@Table(name = "persons")
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Person {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String email;
+    private String phone;
+    // Common accessors and account status mutators
+}
+
+@Entity
+@Table(name = "students")
+@PrimaryKeyJoinColumn(name = "id")
+public class Student extends Person {
+    private String rollNumber;
+    private int semester;
+}
+\end{lstlisting}
+\textbf{Architectural Justification:} JPA Joined Inheritance eliminates redundant database columns. \texttt{Student}, \texttt{Faculty}, and \texttt{Admin} inherit common identity without code duplication, while mapping to normalized database tables.
+
+\subsection{3. Abstraction}
+\textbf{Definition:} Abstraction represents essential properties of an entity while hiding non-essential implementation complexities through abstract classes and interfaces.\\[0.2cm]
+\textbf{Implementation Class:} \texttt{GradingStrategy.java} (\texttt{backend/src/main/java/com/campusconnect/patterns/strategy/GradingStrategy.java})\\[0.2cm]
+\textbf{Code Snippet:}
+\begin{lstlisting}
+public interface GradingStrategy {
+    GradingResult evaluate(double score, List<Double> cohortScores);
+    GradingScheme getScheme();
+}
+\end{lstlisting}
+\textbf{Architectural Justification:} The calling grade service interacts exclusively with the abstract \texttt{evaluate()} contract. The service does not know whether grades are evaluated via absolute cutoffs or Gaussian normal curve Z-scores.
+
+\subsection{4. Polymorphism}
+\textbf{Definition:} Polymorphism is the capability of different classes to respond to the same method invocation in class-specific ways, resolved dynamically at runtime.\\[0.2cm]
+\textbf{Implementation Classes:} \texttt{AbsoluteGradingStrategy.java} and \texttt{RelativeGradingStrategy.java}\\[0.2cm]
+\textbf{Code Snippet:}
+\begin{lstlisting}
+@Component
+public class RelativeGradingStrategy implements GradingStrategy {
+    @Override
+    public GradingResult evaluate(double score, List<Double> cohortScores) {
+        double mean = cohortScores.stream().mapToDouble(Double::doubleValue).average().orElse(50.0);
+        double stdDev = Math.sqrt(cohortScores.stream().mapToDouble(s -> Math.pow(s - mean, 2)).average().orElse(1.0));
+        double zScore = (score - mean) / (stdDev == 0 ? 1.0 : stdDev);
+
+        if (zScore >= 1.5) return new GradingResult("A+", 10.0, "Outstanding (Z >= +1.5)");
+        if (zScore >= 1.0) return new GradingResult("A", 9.0, "Excellent (Z >= +1.0)");
+        if (zScore >= 0.0) return new GradingResult("B", 8.0, "Above Average (Z >= 0.0)");
+        if (zScore >= -1.0) return new GradingResult("C", 7.0, "Average (Z >= -1.0)");
+        return new GradingResult("F", 0.0, "Fail (Below Mean - 1 StdDev)");
+    }
+}
+\end{lstlisting}
+\textbf{Architectural Justification:} When \texttt{gradeService.evaluateGrade()} calls \texttt{strategy.evaluate()}, Java executes the exact mathematical strategy polymorphically at runtime via Dynamic Method Dispatch.
+
+\section{Object-Oriented Relationships}
+\begin{itemize}
+    \item \textbf{Association (*uses-a*):} \texttt{UserAccount} $\leftrightarrow$ \texttt{Person}. Bidirectional link authenticating person entities.
+    \item \textbf{Aggregation (*has-a, shared lifecycle*):} \texttt{Department} $\diamond--$ \texttt{Faculty} and \texttt{Department} $\diamond--$ \texttt{Course}. Faculty and courses belong to departments, but survive departmental reorganization.
+    \item \textbf{Composition (*part-of, strong lifecycle*):} \texttt{Course} $\blacklozenge--$ \texttt{AssessmentComponent} and \texttt{AttendanceSession} $\blacklozenge--$ \texttt{AttendanceRecord}. Configured with \texttt{cascade = CascadeType.ALL, orphanRemoval = true}. Deleting a course permanently cascades to its assessment breakdown.
+    \item \textbf{Dependency (*transient usage*):} \texttt{AdminStudentController} ..> \texttt{StudentService} via constructor injection.
+\end{itemize}
+
+% ==========================================
+% CHAPTER 6: UML MODELLING
+% ==========================================
+\chapter{UML Modelling}
+
+\section{Overview of the Eight UML Diagrams}
+In compliance with standard software engineering practices, CampusConnect is modeled across structural, behavioral, architectural, and persistence views.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.85\textwidth]{../Rendered_Diagrams/01_use_case_diagram.png}
+\caption{System Use Case Diagram: Actor Boundaries and Interactions}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.95\textwidth]{../Rendered_Diagrams/02_class_diagram_landscape.png}
+\caption{Domain Class Diagram: Entity Hierarchies and Design Patterns}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.85\textwidth]{../Rendered_Diagrams/login_sequence_diagram.png}
+\caption{Sequence Diagram: JWT Authentication and Role-Based Dispatch}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{../Rendered_Diagrams/enrollment_activity_diagram.png}
+\caption{Activity Diagram: Course Enrollment Business Flow}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\textwidth]{../Rendered_Diagrams/enrollment_state_diagram.png}
+\caption{State Machine Diagram: Academic Enrollment Lifecycle}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.85\textwidth]{../Rendered_Diagrams/component_diagram.png}
+\caption{Component Diagram: Multi-Tier Architectural Subsystems}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.85\textwidth]{../Rendered_Diagrams/deployment_diagram.png}
+\caption{Deployment Diagram: Runtime Topology and Network Boundaries}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.95\textwidth]{../Rendered_Diagrams/er_diagram.png}
+\caption{Entity-Relationship (ER) Diagram: Normalized Relational Schema}
+\end{figure}
+
+% ==========================================
+% CHAPTER 7: SOFTWARE ARCHITECTURE AND DESIGN
+% ==========================================
+\chapter{Software Architecture and Design}
+
+\section{Layered Modular Monolithic Architecture}
+CampusConnect is structured as a Layered Modular Monolith, optimizing developer productivity, transactional consistency, and deployment simplicity:
+\begin{itemize}
+    \item \textbf{Controller Layer:} Handles REST protocol termination, request validation, and HTTP status codes.
+    \item \textbf{Security Layer:} Intercepts requests, validates JWT cryptographic signatures, and establishes \texttt{SecurityContext}.
+    \item \textbf{Service Layer:} Orchestrates business workflows, transaction boundaries (\texttt{@Transactional}), and pattern invocations.
+    \item \textbf{Pattern Package:} Encapsulates State, Strategy, and Builder pattern abstractions.
+    \item \textbf{Repository Layer:} Interfaces extending Spring Data JPA providing typed relational persistence.
+\end{itemize}
+
+\section{Gang of Four (GoF) Design Patterns}
+\subsection{1. State Pattern (Behavioral)}
+Models the enrollment lifecycle through six discrete states (\texttt{DraftState}, \texttt{SubmittedState}, \texttt{ApprovedState}, \texttt{EnrolledState}, \texttt{DroppedState}, \texttt{RejectedState}). Transition methods throw \texttt{IllegalStateException} on invalid flows (e.g., attempting to approve an enrollment that has been dropped).
+
+\subsection{2. Strategy Pattern (Behavioral)}
+Decouples grading algorithms from grade management services. Course offerings specify either \texttt{ABSOLUTE} or \texttt{RELATIVE} schemes, instantiated dynamically via \texttt{GradingStrategyFactory}.
+
+\subsection{3. Builder Pattern (Creational)}
+Constructs multi-part academic transcript reports step-by-step through \texttt{TranscriptBuilder}, \texttt{ConcreteTranscriptBuilder}, and \texttt{TranscriptDirector}, avoiding telescoping constructors.
+
+\subsection{4. Observer Pattern (Behavioral)}
+\texttt{AcademicEventListener} captures Spring domain events (\texttt{GradePublishedEvent}, \texttt{AttendanceShortageEvent}) and persists in-app notifications asynchronously.
+
+\section{SOLID Principles Verification}
+\begin{itemize}
+    \item \textbf{Single Responsibility Principle (SRP):} Followed across all layers (entities hold data rules; services hold workflows; controllers handle HTTP).
+    \item \textbf{Open/Closed Principle (OCP):} Followed in grading strategies and enrollment states (new strategies added without altering existing classes).
+    \item \textbf{Liskov Substitution Principle (LSP):} Followed in \texttt{Person} hierarchy (\texttt{Student}, \texttt{Faculty}, and \texttt{Admin} substitute \texttt{Person} seamlessly).
+    \item \textbf{Interface Segregation Principle (ISP):} Partially followed (Pattern interfaces are small and focused; entity service interfaces combine CRUD and reporting).
+    \item \textbf{Dependency Inversion Principle (DIP):} Fully followed (Controllers depend on service interfaces; services depend on repository interfaces).
+\end{itemize}
+
+% ==========================================
+% CHAPTER 8: IMPLEMENTATION DETAILS
+% ==========================================
+\chapter{Implementation Details}
+
+\section{Technology Stack}
+\begin{itemize}
+    \item \textbf{Backend:} Java 21 LTS, Spring Boot 3.3.5, Spring Security 6.3.4, Hibernate ORM 6.5.3, JJWT 0.12.6, Flyway 10.10.
+    \item \textbf{Frontend:} React 18.3.1, TypeScript 5.6.3, Vite 5.4.10, Tailwind CSS 3.4.14, Recharts 2.13.3, Lucide React 0.454.
+    \item \textbf{Database:} PostgreSQL 16 relational engine with HikariCP connection pooling.
+\end{itemize}
+
+\section{Security Implementation and IDOR Mitigation}
+In legacy systems, passing a \texttt{studentId} in an API URL allows students to access peers' records (Insecure Direct Object Reference). In CampusConnect, \texttt{AcademicSecurityService} verifies the authenticated JWT caller identity against the requested record owner:
+\begin{lstlisting}
+public boolean canAccessStudent(Long requestedStudentId) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) return true;
+    UserAccount user = userAccountRepository.findByUsername(auth.getName()).orElseThrow();
+    return user.getPerson().getId().equals(requestedStudentId);
+}
+\end{lstlisting}
+
+% ==========================================
+% CHAPTER 9: TESTING AND QUALITY ASSURANCE
+% ==========================================
+\chapter{Testing and Quality Assurance}
+
+\section{Testing Strategy and Test Matrix}
+Testing was conducted across three distinct layers:
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{p{0.3\textwidth}p{0.25\textwidth}p{0.15\textwidth}p{0.15\textwidth}}
+\toprule
+\textbf{Test Category} & \textbf{Framework} & \textbf{Executed} & \textbf{Status} \\
+\midrule
+Backend Unit \& Integration & JUnit 5, Mockito, Spring Boot Test & 57 & 100\% Pass \\
+Frontend Component Tests & Vitest, React Testing Library, jsdom & 18 & 100\% Pass \\
+Live Security \& API Audits & REST Client, cURL, HTTP & 36 & 100\% Pass \\
+\textbf{TOTAL TEST SUITE} & & \textbf{112} & \textbf{100\% Pass} \\
+\bottomrule
+\end{tabular}
+\caption{Empirical Test Execution Summary}
+\end{table}
+
+\section{Defect Remediation Log}
+During initial audits, 8 specific defects were discovered and resolved:
+\begin{itemize}
+    \item \textbf{BUG-01, 02, 03 (Critical IDOR):} Resolved in \texttt{EnrollmentController}, \texttt{AttendanceController}, and \texttt{GradeController} via caller ownership validation.
+    \item \textbf{BUG-04 (High):} Corrected 0-based vs 1-based pagination mismatch in course queries.
+    \item \textbf{BUG-05 (High):} Fixed \texttt{LocalTime} deserializer supporting both \texttt{HH:mm} and \texttt{HH:mm:ss} formats.
+    \item \textbf{BUG-06 (Medium):} Aligned DTO contract mismatch (\texttt{personId} vs \texttt{studentId}) in student registration.
+    \item \textbf{BUG-07 (Medium):} Handled foreign key constraint violations on department deletion.
+    \item \textbf{BUG-08 (Low):} Fixed division-by-zero on attendance calculations for newly enrolled courses.
+\end{itemize}
+
+% ==========================================
+% CHAPTER 10: PROJECT PLANNING AND MANAGEMENT
+% ==========================================
+\chapter{Project Planning and Management}
+
+\section{SDLC Model Justification}
+An Iterative Hybrid model was selected, combining structured architectural planning with iterative test-driven milestones. Development progressed in two distinct phases: Phase 1 Core Infrastructure, followed by Phase 2 Advanced Patterns and Analytics.
+
+\section{Three-Member Contribution Matrix}
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{p{0.25\textwidth}p{0.35\textwidth}p{0.3\textwidth}}
+\toprule
+\textbf{Member Details} & \textbf{Technical Domains} & \textbf{Modules \& Documentation} \\
+\midrule
+\textbf{[Student 1 Name]}\newline Roll: [Roll Number 1] & Backend Architecture, Spring Security, JWT, Strategy Pattern, Audit Service. & Chapters 1, 2, 7, 8; Presentation Slides 1--6; Security Audit. \\
+\textbf{[Student 2 Name]}\newline Roll: [Roll Number 2] & React 18 Frontend, State Machine Pattern, Timetable UI, Route Guards. & Chapters 3, 4, 6, 11; Presentation Slides 7--12; UML Diagrams. \\
+\textbf{[Student 3 Name]}\newline Roll: [Roll Number 3] & PostgreSQL Database, Builder Pattern, Flyway Migrations, QA Suite (112 tests). & Chapters 5, 9, 10, 12; Presentation Slides 13--18; Test Logs. \\
+\bottomrule
+\end{tabular}
+\caption{Three-Member Team Responsibility Matrix}
+\end{table}
+
+% ==========================================
+% CHAPTER 11: SOFTWARE MAINTENANCE
+% ==========================================
+\chapter{Software Maintenance}
+
+\section{Maintenance Typology}
+\begin{itemize}
+    \item \textbf{Corrective Maintenance:} Rapid triage and resolution of edge-case bugs and security IDOR vulnerabilities.
+    \item \textbf{Adaptive Maintenance:} Upgrading dependency frameworks (Spring Boot 3.2 to 3.3.5, PostgreSQL 15 to 16, Vite 4 to 5).
+    \item \textbf{Perfective Maintenance:} Enhancing grading computations with Gaussian normal curves and expanding transcript layouts.
+    \item \textbf{Preventive Maintenance:} Enforcing static analysis, `.gitattributes` binary normalization, and automated regression testing before every commit.
+\end{itemize}
+
+% ==========================================
+% CHAPTER 12: RESULTS AND CONCLUSION
+% ==========================================
+\chapter{Results, Limitations, and Future Scope}
+
+\section{Key Results}
+CampusConnect successfully demonstrates that enterprise academic management can be achieved through clean Object-Oriented principles. All 16 functional requirements were implemented, verified through 112 automated tests, and validated across responsive web portals.
+
+\section{System Limitations}
+\begin{itemize}
+    \item High-availability clustering and distributed multi-region database replication are not configured.
+    \item Biometric hardware integration is simulated via authenticated faculty portal sessions.
+\end{itemize}
+
+\section{Future Enhancements}
+\begin{itemize}
+    \item Progressive Web App (PWA) offline support for timetables.
+    \item Direct hardware RFID card reader integration for automated classroom attendance.
+    \item Assignment submission dropboxes with automated plagiarism screening.
+\end{itemize}
+
+\section{Conclusion}
+This project provided comprehensive practical experience in Object-Oriented Methodology, architectural modeling, Spring Boot enterprise engineering, and software quality assurance, preparing the student team for modern industry software engineering.
+
+% ==========================================
+% REFERENCES & APPENDICES
+% ==========================================
+\chapter*{References}
+\addcontentsline{toc}{chapter}{References}
+\begin{enumerate}
+    \item Gamma, E., Helm, R., Johnson, R., and Vlissides, J., \textit{Design Patterns: Elements of Reusable Object-Oriented Software}, Addison-Wesley, 1994.
+    \item Martin, R. C., \textit{Clean Architecture: A Craftsman's Guide to Software Structure and Design}, Prentice Hall, 2017.
+    \item Walls, C., \textit{Spring in Action, Sixth Edition}, Manning Publications, 2022.
+    \item Fowler, M., \textit{Patterns of Enterprise Application Architecture}, Addison-Wesley, 2002.
+    \item IEEE Computer Society, \textit{Software Engineering Body of Knowledge (SWEBOK v3.0)}, IEEE, 2014.
+\end{enumerate}
+
+\appendix
+\chapter{REST API Specification Summary}
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{HTTP Method} & \textbf{Endpoint Path} & \textbf{Authorized Roles} \\
+\midrule
+POST & \texttt{/api/v1/auth/login} & Public \\
+GET & \texttt{/api/v1/admin/stats} & ROLE\_ADMIN \\
+GET, POST & \texttt{/api/v1/admin/departments} & ROLE\_ADMIN \\
+GET, POST & \texttt{/api/v1/admin/students} & ROLE\_ADMIN \\
+GET, POST & \texttt{/api/v1/admin/faculty} & ROLE\_ADMIN \\
+GET, POST & \texttt{/api/v1/courses} & ROLE\_ADMIN, ROLE\_FACULTY, ROLE\_STUDENT \\
+POST & \texttt{/api/v1/enrollments} & ROLE\_STUDENT \\
+PATCH & \texttt{/api/v1/enrollments/\{id\}/status} & ROLE\_ADMIN, ROLE\_FACULTY \\
+POST & \texttt{/api/v1/attendance/sessions} & ROLE\_FACULTY \\
+POST & \texttt{/api/v1/grades} & ROLE\_FACULTY \\
+GET & \texttt{/api/v1/transcripts/student/\{id\}} & ROLE\_ADMIN, ROLE\_STUDENT \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
