@@ -1,0 +1,76 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam activity {
+    BackgroundColor #F8FAFC
+    BorderColor #475569
+    ArrowColor #334155
+    BarColor #4F46E5
+}
+
+start
+
+:Student logs in with JWT credentials;
+:Navigate to Course Catalog (/student/catalog);
+
+:Fetch available curriculum courses and student current enrollments;
+:Display course cards with credit weight, semester, capacity, and status;
+
+:Student selects a course and clicks "Register Course";
+
+if (Is student already registered/enrolled in this course this semester?) then (Yes (Duplicate))
+    :Backend detects existing enrollment record;
+    :Throw DuplicateEnrollmentException;
+    :Return HTTP 409 Conflict;
+    :Display error: "Student is already enrolled in this course";
+    stop
+else (No)
+    if (Has course reached maximum capacity?) then (Yes (Course Full))
+        :Backend checks course.enrolledCount >= course.capacity;
+        :Throw CourseFullException;
+        :Return HTTP 400 Bad Request;
+        :Display error: "Course capacity reached";
+        stop
+    else (No (Seats Available))
+        :Instantiate Enrollment in SUBMITTED state;
+        :Persist record to database (status = 'SUBMITTED');
+        :Publish AuditLog Event (action = 'ENROLLMENT_STATUS_CHANGE');
+        :Return HTTP 201 Created with EnrollmentResponse;
+        :Update UI state: Badge becomes "SUBMITTED (Pending)";
+    endif
+endif
+
+|Administrator Workflow|
+:Administrator reviews pending applications in /admin/enrollments;
+
+if (Administrator Decision) then (Approve Application)
+    :Admin triggers PUT /enrollments/{id}/approve;
+    :Transition state: SUBMITTED -> APPROVED;
+    :Update database record;
+    
+    if (Final Institutional Confirmation) then (Confirm Enrollment)
+        :Admin triggers PUT /enrollments/{id}/finalize;
+        :Transition state: APPROVED -> ENROLLED;
+        :Increment course.enrolledCount (+1);
+        :Persist updated enrollment & course stats;
+        :Student is officially enrolled in section;
+    else (Reject at Final Stage)
+        :Admin triggers PUT /enrollments/{id}/reject;
+        :Transition state: APPROVED -> REJECTED;
+        :Application marked terminal rejected;
+    endif
+
+else (Reject Application)
+    :Admin triggers PUT /enrollments/{id}/reject;
+    :Transition state: SUBMITTED -> REJECTED;
+    :Update database record;
+    :Student notified of rejection;
+endif
+
+stop
+
+@enduml

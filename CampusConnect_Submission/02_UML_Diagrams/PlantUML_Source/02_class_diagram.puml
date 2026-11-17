@@ -1,0 +1,257 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+skinparam classAttributeIconSize 0
+
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #475569
+    ArrowColor #334155
+}
+
+package "com.campusconnect.model" {
+
+    abstract class Person {
+        - id: Long
+        - name: String
+        - email: String
+        - phone: String
+        - createdAt: Instant
+        - updatedAt: Instant
+        + getId(): Long
+        + getName(): String
+        + getEmail(): String
+        + getPhone(): String
+    }
+
+    class Admin {
+        - accessLevel: String
+        + getAccessLevel(): String
+        + setAccessLevel(accessLevel: String): void
+    }
+
+    class Faculty {
+        - employeeCode: String
+        - designation: String
+        - departmentId: Long
+        + getEmployeeCode(): String
+        + getDesignation(): String
+        + getDepartmentId(): Long
+    }
+
+    class Student {
+        - rollNumber: String
+        - semester: Integer
+        - departmentId: Long
+        - accountStatus: String
+        + getRollNumber(): String
+        + getSemester(): Integer
+        + getDepartmentId(): Long
+        + promoteSemester(): void
+    }
+
+    class Department {
+        - id: Long
+        - code: String
+        - name: String
+        - description: String
+        + getId(): Long
+        + getCode(): String
+        + getName(): String
+    }
+
+    class Course {
+        - id: Long
+        - code: String
+        - title: String
+        - description: String
+        - credits: Integer
+        - semester: Integer
+        - capacity: Integer
+        - enrolledCount: Integer
+        - departmentId: Long
+        - instructorId: Long
+        + getId(): Long
+        + getCode(): String
+        + getTitle(): String
+        + hasAvailableSeats(): boolean
+        + incrementEnrolled(): void
+        + decrementEnrolled(): void
+    }
+
+    class Enrollment {
+        - id: Long
+        - studentId: Long
+        - courseId: Long
+        - semester: Integer
+        - status: EnrollmentStatus
+        - registeredAt: Instant
+        + getId(): Long
+        + getStatus(): EnrollmentStatus
+        + setStatus(status: EnrollmentStatus): void
+    }
+
+    enum EnrollmentStatus {
+        DRAFT
+        SUBMITTED
+        APPROVED
+        ENROLLED
+        DROPPED
+        REJECTED
+    }
+
+    class Classroom {
+        - id: Long
+        - roomNumber: String
+        - building: String
+        - capacity: Integer
+        - roomType: String
+        + getId(): Long
+        + getRoomNumber(): String
+    }
+
+    class Timetable {
+        - id: Long
+        - courseId: Long
+        - classroomId: Long
+        - facultyId: Long
+        - dayOfWeek: String
+        - startTime: LocalTime
+        - endTime: LocalTime
+        + getId(): Long
+        + getStartTime(): LocalTime
+        + getEndTime(): LocalTime
+    }
+
+    class AttendanceSession {
+        - id: Long
+        - courseId: Long
+        - facultyId: Long
+        - sessionDate: LocalDate
+        - topic: String
+        + getId(): Long
+        + getSessionDate(): LocalDate
+    }
+
+    class AttendanceRecord {
+        - id: Long
+        - sessionId: Long
+        - studentId: Long
+        - status: AttendanceStatus
+        + getId(): Long
+        + getStatus(): AttendanceStatus
+    }
+
+    enum AttendanceStatus {
+        PRESENT
+        ABSENT
+        LATE
+        EXCUSED
+    }
+
+    class CourseAssessment {
+        - id: Long
+        - courseId: Long
+        - title: String
+        - type: String
+        - maxScore: Double
+        - weightagePercentage: Double
+        + getId(): Long
+        + getMaxScore(): Double
+        + getWeightagePercentage(): Double
+    }
+
+    class StudentGrade {
+        - id: Long
+        - assessmentId: Long
+        - studentId: Long
+        - scoreObtained: Double
+        - comments: String
+        + getId(): Long
+        + getScoreObtained(): Double
+    }
+
+    class UserAccount {
+        - id: Long
+        - username: String
+        - passwordHash: String
+        - role: Role
+        - personId: Long
+        - enabled: Boolean
+        + getId(): Long
+        + getUsername(): String
+        + getRole(): Role
+    }
+
+    enum Role {
+        ROLE_ADMIN
+        ROLE_FACULTY
+        ROLE_STUDENT
+    }
+}
+
+package "com.campusconnect.pattern.state" {
+    interface EnrollmentState {
+        + submit(enrollment: Enrollment): void
+        + approve(enrollment: Enrollment): void
+        + finalizeEnrollment(enrollment: Enrollment): void
+        + drop(enrollment: Enrollment): void
+        + reject(enrollment: Enrollment): void
+    }
+
+    class DraftState implements EnrollmentState
+    class SubmittedState implements EnrollmentState
+    class ApprovedState implements EnrollmentState
+    class EnrolledState implements EnrollmentState
+    class DroppedState implements EnrollmentState
+    class RejectedState implements EnrollmentState
+}
+
+package "com.campusconnect.pattern.strategy" {
+    interface GradingStrategy {
+        + calculateGrade(score: Double, maxScore: Double): String
+        + calculateGpa(percentage: Double): Double
+    }
+
+    class PercentageGradingStrategy implements GradingStrategy
+    class LetterGradingStrategy implements GradingStrategy
+    class GpaGradingStrategy implements GradingStrategy
+}
+
+' Inheritance
+Person <|-- Admin
+Person <|-- Faculty
+Person <|-- Student
+
+' Associations
+Department "1" o-- "0..*" Course : offers >
+Department "1" o-- "0..*" Faculty : employs >
+Department "1" o-- "0..*" Student : enrolls >
+Course "1" -- "0..1" Faculty : taught by >
+Student "1" -- "0..*" Enrollment : applies for >
+Course "1" -- "0..*" Enrollment : registers >
+Enrollment --> EnrollmentStatus
+
+Timetable "0..*" -- "1" Course : schedules >
+Timetable "0..*" -- "1" Classroom : occupies >
+Timetable "0..*" -- "1" Faculty : assigned to >
+
+AttendanceSession "1" *-- "0..*" AttendanceRecord : contains >
+AttendanceSession "0..*" -- "1" Course : belongs to >
+AttendanceRecord "0..*" -- "1" Student : tracks >
+AttendanceRecord --> AttendanceStatus
+
+CourseAssessment "0..*" -- "1" Course : evaluates >
+StudentGrade "0..*" -- "1" CourseAssessment : records >
+StudentGrade "0..*" -- "1" Student : marks >
+
+UserAccount "1" -- "1" Person : authenticates >
+UserAccount --> Role
+
+Enrollment ..> EnrollmentState : transitions via >
+StudentGrade ..> GradingStrategy : evaluates via >
+
+@enduml

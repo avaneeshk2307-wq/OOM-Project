@@ -33,3 +33,4 @@ CampusConnect/frontend/coverage/
 *.pdf
 *.zip
 !CampusConnect/diagrams/*.puml
+!CampusConnect_Submission/**/*.pdf

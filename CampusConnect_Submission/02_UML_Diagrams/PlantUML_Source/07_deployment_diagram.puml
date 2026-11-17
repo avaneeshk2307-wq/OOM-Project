@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam node {
+    BackgroundColor #F8FAFC
+    BorderColor #475569
+}
+
+skinparam artifact {
+    BackgroundColor #EEF2FF
+    BorderColor #4F46E5
+}
+
+node "Client Workstation / Mobile Device" as Node_Client {
+    node "Modern Web Browser (Chrome / Edge / Firefox)" {
+        artifact "React SPA Client Bundle\n(HTML5 / CSS3 / ES2020 JS)\n- 87.64 kB main chunk\n- Lazy-loaded route chunks" as Art_ReactApp
+    }
+}
+
+node "Frontend Server / Web Host" as Node_FrontendServer {
+    node "Vite Dev Server (or Nginx Web Server)" {
+        artifact "Static Web Assets\n(dist/assets/*)\n- HTML, JS, CSS, SVG" as Art_DistAssets
+    }
+}
+
+node "Application Server Host" as Node_AppServer {
+    node "Docker Container: backend (or Host OS Process)" {
+        node "Java 21 JVM Environment" {
+            node "Spring Boot 3.3.5 Embedded Tomcat Engine\n(Port: 8080)" {
+                artifact "campusconnect-backend.jar\n- Spring MVC REST APIs\n- Spring Security Filter Chain\n- Spring Data JPA Repositories" as Art_BackendJar
+            }
+        }
+    }
+}
+
+node "Database Server Host" as Node_DBServer {
+    node "Docker Container: postgres (or Local/Embedded Engine)" {
+        node "PostgreSQL 16 Relational Engine\n(Port: 5432)" {
+            database "campusconnect_db\n(Tables, Indexes, Foreign Keys,\nFlyway Migrations V1..V4)" as DB_Postgres
+        }
+    }
+    node "In-Memory Test Engine" {
+        database "H2 In-Memory DB\n(jdbc:h2:mem:campusconnect_test)" as DB_H2
+    }
+}
+
+Node_Client -- Node_FrontendServer : HTTP / HTTPS (Port 5173 / 80 / 443)\nFetch static bundle >
+Node_Client -- Node_AppServer : REST API Calls over HTTPS (Port 8080)\nJSON Payloads with JWT Bearer Token >
+Node_AppServer -- Node_DBServer : JDBC Connection via HikariCP Pool (Port 5432)\nSQL Queries / Transactions >
+
+@enduml

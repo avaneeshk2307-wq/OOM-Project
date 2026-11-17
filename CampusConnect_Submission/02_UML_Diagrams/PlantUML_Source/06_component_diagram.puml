@@ -1,0 +1,114 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam component {
+    BackgroundColor #F8FAFC
+    BorderColor #475569
+    ArrowColor #334155
+}
+
+package "Client Tier — React SPA (TypeScript + Vite)" {
+    component [AuthContext & State] as Comp_AuthContext
+    component [RoleGuard & Router] as Comp_Router
+    component [Admin Management Module] as Comp_AdminUI
+    component [Faculty Portal Module] as Comp_FacultyUI
+    component [Student Self-Service Module] as Comp_StudentUI
+    component [Axios HTTP Client] as Comp_Axios
+
+    Comp_AdminUI ..> Comp_Router
+    Comp_FacultyUI ..> Comp_Router
+    Comp_StudentUI ..> Comp_Router
+    Comp_Router ..> Comp_AuthContext
+    Comp_AdminUI ..> Comp_Axios
+    Comp_FacultyUI ..> Comp_Axios
+    Comp_StudentUI ..> Comp_Axios
+}
+
+interface "REST API (JSON over HTTPS)" as REST_API
+
+Comp_Axios ..> REST_API : invokes >
+
+package "Application Server Tier — Spring Boot 3.3.5 (Java 21)" {
+    
+    package "Security Subsystem" {
+        component [JwtAuthenticationFilter] as Comp_JwtFilter
+        component [AcademicSecurityService] as Comp_AcademicSec
+        component [SecurityConfig (FilterChain)] as Comp_SecConfig
+        
+        Comp_JwtFilter ..> Comp_SecConfig
+        Comp_AcademicSec ..> Comp_SecConfig
+    }
+    
+    package "REST Controller Layer" {
+        component [AuthController] as Ctrl_Auth
+        component [Admin Controllers] as Ctrl_Admin
+        component [EnrollmentController] as Ctrl_Enroll
+        component [AttendanceController] as Ctrl_Attend
+        component [GradeController] as Ctrl_Grade
+        component [TimetableController] as Ctrl_Time
+        component [AnalyticsController] as Ctrl_Analytics
+    }
+    
+    package "Business Service Layer" {
+        component [AuthService / UserDetailsService] as Svc_Auth
+        component [Student & Faculty Services] as Svc_Users
+        component [Course & Dept Services] as Svc_Course
+        component [EnrollmentService (State Pattern)] as Svc_Enroll
+        component [AttendanceService] as Svc_Attend
+        component [GradeService (Strategy Pattern)] as Svc_Grade
+        component [TimetableService] as Svc_Time
+        component [AnalyticsService] as Svc_Analytics
+    }
+    
+    package "Persistence & Data Access Layer" {
+        component [Spring Data JPA Repositories] as Comp_Repos
+        component [Hibernate ORM Engine] as Comp_Hibernate
+        component [Entity Domain Models] as Comp_Entities
+    }
+}
+
+REST_API ..> Comp_JwtFilter
+Comp_JwtFilter ..> Ctrl_Auth
+Comp_JwtFilter ..> Ctrl_Admin
+Comp_JwtFilter ..> Ctrl_Enroll
+Comp_JwtFilter ..> Ctrl_Attend
+Comp_JwtFilter ..> Ctrl_Grade
+Comp_JwtFilter ..> Ctrl_Time
+Comp_JwtFilter ..> Ctrl_Analytics
+
+Ctrl_Enroll ..> Comp_AcademicSec : @PreAuthorize
+Ctrl_Attend ..> Comp_AcademicSec : @PreAuthorize
+Ctrl_Grade ..> Comp_AcademicSec : @PreAuthorize
+
+Ctrl_Auth ..> Svc_Auth
+Ctrl_Admin ..> Svc_Users
+Ctrl_Admin ..> Svc_Course
+Ctrl_Enroll ..> Svc_Enroll
+Ctrl_Attend ..> Svc_Attend
+Ctrl_Grade ..> Svc_Grade
+Ctrl_Time ..> Svc_Time
+Ctrl_Analytics ..> Svc_Analytics
+
+Svc_Auth ..> Comp_Repos
+Svc_Users ..> Comp_Repos
+Svc_Course ..> Comp_Repos
+Svc_Enroll ..> Comp_Repos
+Svc_Attend ..> Comp_Repos
+Svc_Grade ..> Comp_Repos
+Svc_Time ..> Comp_Repos
+Svc_Analytics ..> Comp_Repos
+
+Comp_Repos ..> Comp_Hibernate
+Comp_Hibernate ..> Comp_Entities
+
+database "Database Tier" {
+    database "PostgreSQL Relational DB\n(or H2 In-Memory DB)" as Comp_DB
+}
+
+Comp_Hibernate ..> Comp_DB : JDBC / SQL
+
+@enduml

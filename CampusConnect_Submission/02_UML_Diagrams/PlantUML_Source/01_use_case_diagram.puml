@@ -1,0 +1,111 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+skinparam actor {
+    BackgroundColor #EEF2FF
+    BorderColor #4F46E5
+}
+
+skinparam usecase {
+    BackgroundColor #F8FAFC
+    BorderColor #64748B
+    ArrowColor #475569
+}
+
+left to right direction
+
+actor "Administrator" as Admin
+actor "Faculty Member" as Faculty
+actor "Student" as Student
+
+rectangle "CampusConnect — Smart Campus Management System" {
+    
+    package "Authentication & Profile" {
+        usecase "Authenticate with Credentials" as UC_Login
+        usecase "View Profile & Role Details" as UC_Profile
+        usecase "Logout of System" as UC_Logout
+    }
+    
+    package "Academic Administration (Admin)" {
+        usecase "Manage Departments" as UC_ManageDepts
+        usecase "Manage Faculty Accounts" as UC_ManageFaculty
+        usecase "Manage Student Roster" as UC_ManageStudents
+        usecase "Promote Student Semester" as UC_Promote
+        usecase "Manage Curriculum Courses" as UC_ManageCourses
+        usecase "Assign Course Instructor" as UC_AssignInstructor
+        usecase "Schedule Timetable & Classrooms" as UC_TimetableAdmin
+        usecase "Review & Finalize Enrollments" as UC_ReviewEnrollments
+        usecase "View Campus Analytics" as UC_Analytics
+        usecase "Inspect Security Audit Logs" as UC_AuditLogs
+        usecase "Broadcast Announcements" as UC_Announcements
+    }
+    
+    package "Instructional Management (Faculty)" {
+        usecase "View Teaching Schedule" as UC_FacultySchedule
+        usecase "Record Attendance Session" as UC_MarkAttendance
+        usecase "Create Course Assessments" as UC_CreateAssessment
+        usecase "Enter Student Grades" as UC_EnterGrades
+        usecase "Review Enrolled Students" as UC_ViewEnrolled
+    }
+    
+    package "Student Self-Service (Student)" {
+        usecase "Browse Course Catalog" as UC_BrowseCatalog
+        usecase "Register for Course" as UC_RegisterCourse
+        usecase "Drop Enrolled Course" as UC_DropCourse
+        usecase "View Weekly Schedule" as UC_StudentSchedule
+        usecase "Monitor Attendance Percentage" as UC_ViewAttendance
+        usecase "View Grades & Academic Transcript" as UC_ViewGrades
+    }
+}
+
+' Common Actor Links
+Admin --> UC_Login
+Admin --> UC_Profile
+Admin --> UC_Logout
+Faculty --> UC_Login
+Faculty --> UC_Profile
+Faculty --> UC_Logout
+Student --> UC_Login
+Student --> UC_Profile
+Student --> UC_Logout
+
+' Admin Links
+Admin --> UC_ManageDepts
+Admin --> UC_ManageFaculty
+Admin --> UC_ManageStudents
+Admin --> UC_Promote
+Admin --> UC_ManageCourses
+Admin --> UC_AssignInstructor
+Admin --> UC_TimetableAdmin
+Admin --> UC_ReviewEnrollments
+Admin --> UC_Analytics
+Admin --> UC_AuditLogs
+Admin --> UC_Announcements
+
+' Faculty Links
+Faculty --> UC_FacultySchedule
+Faculty --> UC_MarkAttendance
+Faculty --> UC_CreateAssessment
+Faculty --> UC_EnterGrades
+Faculty --> UC_ViewEnrolled
+
+' Student Links
+Student --> UC_BrowseCatalog
+Student --> UC_RegisterCourse
+Student --> UC_DropCourse
+Student --> UC_StudentSchedule
+Student --> UC_ViewAttendance
+Student --> UC_ViewGrades
+
+' Include & Extend relationships
+UC_RegisterCourse ..> UC_BrowseCatalog : <<include>>
+UC_DropCourse ..> UC_RegisterCourse : <<extend>>
+UC_Promote ..> UC_ManageStudents : <<extend>>
+UC_AssignInstructor ..> UC_ManageCourses : <<include>>
+UC_EnterGrades ..> UC_CreateAssessment : <<include>>
+
+@enduml

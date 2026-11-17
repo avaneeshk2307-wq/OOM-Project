@@ -1,0 +1,91 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam sequence {
+    ArrowColor #334155
+    ActorBorderColor #4F46E5
+    ActorBackgroundColor #EEF2FF
+    LifeLineBorderColor #64748B
+    LifeLineBackgroundColor #F1F5F9
+    ParticipantBorderColor #475569
+    ParticipantBackgroundColor #F8FAFC
+}
+
+autonumber
+
+actor "User (Admin/Faculty/Student)" as User
+participant "React Frontend\n(LoginPage.tsx)" as Frontend
+participant "AuthContext\n(Client State)" as AuthContext
+participant "AuthController\n(Spring REST)" as Controller
+participant "AuthenticationManager\n(Spring Security)" as AuthManager
+participant "UserDetailsServiceImpl\n(Security Service)" as UserDetailsService
+participant "UserAccountRepository\n(Spring Data JPA)" as Repo
+database "PostgreSQL / H2\n(Database Engine)" as DB
+participant "PasswordEncoder\n(BCrypt)" as Encoder
+participant "JwtTokenProvider\n(Token Minting)" as JwtProvider
+
+User -> Frontend: 1. Select Portal Role (Admin, Faculty, Student)
+User -> Frontend: 2. Input Username & Password
+User -> Frontend: 3. Click "Sign In" Button
+
+activate Frontend
+Frontend -> Controller: 4. POST /api/v1/auth/login\n{ username, password }
+activate Controller
+
+Controller -> AuthManager: 5. authenticate(UsernamePasswordAuthenticationToken)
+activate AuthManager
+
+AuthManager -> UserDetailsService: 6. loadUserByUsername(username)
+activate UserDetailsService
+
+UserDetailsService -> Repo: 7. findByUsername(username)
+activate Repo
+
+Repo -> DB: 8. SELECT * FROM user_accounts WHERE username = ?
+activate DB
+DB --> Repo: 9. UserAccount Record (PasswordHash, Role, PersonId)
+deactivate DB
+
+Repo --> UserDetailsService: 10. Optional<UserAccount>
+deactivate Repo
+
+UserDetailsService --> AuthManager: 11. UserDetails Object
+deactivate UserDetailsService
+
+AuthManager -> Encoder: 12. matches(rawPassword, encodedPassword)
+activate Encoder
+Encoder --> AuthManager: 13. Credentials Valid (true)
+deactivate Encoder
+
+AuthManager --> Controller: 14. Authentication Object (Principal)
+deactivate AuthManager
+
+Controller -> JwtProvider: 15. generateToken(authentication, userAccount)
+activate JwtProvider
+JwtProvider --> Controller: 16. Signed JWT String (HS256)
+deactivate JwtProvider
+
+Controller --> Frontend: 17. HTTP 200 OK\nLoginResponse { token, role, personId, username, fullName }
+deactivate Controller
+
+Frontend -> AuthContext: 18. login(token, userData)
+activate AuthContext
+AuthContext -> AuthContext: 19. localStorage.setItem('token', token)\nlocalStorage.setItem('user', userData)
+AuthContext --> Frontend: 20. Session Synchronized
+deactivate AuthContext
+
+Frontend -> Frontend: 21. Evaluate user.role in AppRoutes
+alt role == 'ROLE_ADMIN'
+    Frontend --> User: 22a. Navigate to /admin (AdminOverview)
+else role == 'ROLE_FACULTY'
+    Frontend --> User: 22b. Navigate to /faculty (FacultyOverview)
+else role == 'ROLE_STUDENT'
+    Frontend --> User: 22c. Navigate to /student (StudentOverview)
+end
+deactivate Frontend
+
+@enduml

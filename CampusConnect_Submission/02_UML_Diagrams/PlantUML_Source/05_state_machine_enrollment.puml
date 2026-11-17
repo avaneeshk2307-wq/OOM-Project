@@ -1,0 +1,64 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam state {
+    BackgroundColor #F8FAFC
+    BorderColor #475569
+    ArrowColor #334155
+    StartColor #4F46E5
+    EndColor #0F172A
+}
+
+[*] --> DRAFT : Student selects course\n/ creates draft application
+
+state DRAFT {
+    DRAFT : Initial creation state
+    DRAFT : Course selection buffered
+}
+
+DRAFT --> SUBMITTED : submit() [student submits registration]\n/ POST /enrollments/register
+
+state SUBMITTED {
+    SUBMITTED : Application pending admin review
+    SUBMITTED : Seat not yet counted in enrolledCount
+}
+
+SUBMITTED --> APPROVED : approve() [admin approves prerequisites]\n/ PUT /enrollments/{id}/approve
+
+SUBMITTED --> REJECTED : reject() [admin declines application]\n/ PUT /enrollments/{id}/reject
+
+state APPROVED {
+    APPROVED : Application cleared by department
+    APPROVED : Awaiting seat confirmation
+}
+
+APPROVED --> ENROLLED : finalizeEnrollment() [admin finalizes]\n/ PUT /enrollments/{id}/finalize\n[enrolledCount incremented +1]
+
+APPROVED --> REJECTED : reject() [admin revokes clearance]\n/ PUT /enrollments/{id}/reject
+
+state ENROLLED {
+    ENROLLED : Student is officially enrolled
+    ENROLLED : Eligible for attendance and grading
+    ENROLLED : Seat reserved in course capacity
+}
+
+ENROLLED --> DROPPED : drop() [student or admin initiates drop]\n/ PUT /enrollments/{id}/drop\n[enrolledCount decremented -1]
+
+state DROPPED {
+    DROPPED : Terminal state
+    DROPPED : Student deregistered from course
+}
+
+state REJECTED {
+    REJECTED : Terminal state
+    REJECTED : Registration denied
+}
+
+DROPPED --> [*]
+REJECTED --> [*]
+
+@enduml

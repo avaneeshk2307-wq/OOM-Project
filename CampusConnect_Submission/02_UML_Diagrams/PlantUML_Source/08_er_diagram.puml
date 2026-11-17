@@ -1,0 +1,212 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam entity {
+    BackgroundColor #F8FAFC
+    BorderColor #475569
+    ArrowColor #334155
+}
+
+entity "persons" as persons {
+    * id : BIGINT <<PK>>
+    --
+    * name : VARCHAR(255)
+    * email : VARCHAR(255) <<UQ>>
+    phone : VARCHAR(50)
+    * created_at : TIMESTAMPTZ
+    updated_at : TIMESTAMPTZ
+}
+
+entity "admins" as admins {
+    * id : BIGINT <<PK, FK>>
+    --
+    * access_level : VARCHAR(50)
+}
+
+entity "faculty" as faculty {
+    * id : BIGINT <<PK, FK>>
+    --
+    * employee_code : VARCHAR(50) <<UQ>>
+    * designation : VARCHAR(100)
+    * department_id : BIGINT <<FK>>
+}
+
+entity "students" as students {
+    * id : BIGINT <<PK, FK>>
+    --
+    * roll_number : VARCHAR(50) <<UQ>>
+    * semester : INT
+    * department_id : BIGINT <<FK>>
+    * account_status : VARCHAR(50)
+}
+
+entity "user_accounts" as user_accounts {
+    * id : BIGINT <<PK>>
+    --
+    * username : VARCHAR(100) <<UQ>>
+    * password_hash : VARCHAR(255)
+    * role : VARCHAR(50)
+    * person_id : BIGINT <<FK, UQ>>
+    * enabled : BOOLEAN
+    * created_at : TIMESTAMPTZ
+}
+
+entity "departments" as departments {
+    * id : BIGINT <<PK>>
+    --
+    * code : VARCHAR(20) <<UQ>>
+    * name : VARCHAR(255)
+    description : TEXT
+    * created_at : TIMESTAMPTZ
+}
+
+entity "courses" as courses {
+    * id : BIGINT <<PK>>
+    --
+    * code : VARCHAR(50) <<UQ>>
+    * title : VARCHAR(255)
+    description : TEXT
+    * credits : INT
+    * semester : INT
+    * capacity : INT
+    * enrolled_count : INT
+    * department_id : BIGINT <<FK>>
+    faculty_id : BIGINT <<FK>>
+    * created_at : TIMESTAMPTZ
+}
+
+entity "enrollments" as enrollments {
+    * id : BIGINT <<PK>>
+    --
+    * student_id : BIGINT <<FK>>
+    * course_id : BIGINT <<FK>>
+    * semester : INT
+    * status : VARCHAR(50)
+    * registered_at : TIMESTAMPTZ
+    --
+    UQ: (student_id, course_id, semester)
+}
+
+entity "classrooms" as classrooms {
+    * id : BIGINT <<PK>>
+    --
+    * room_number : VARCHAR(50) <<UQ>>
+    * building : VARCHAR(100)
+    * capacity : INT
+    * room_type : VARCHAR(50)
+    * created_at : TIMESTAMPTZ
+}
+
+entity "timetables" as timetables {
+    * id : BIGINT <<PK>>
+    --
+    * course_id : BIGINT <<FK>>
+    * classroom_id : BIGINT <<FK>>
+    * faculty_id : BIGINT <<FK>>
+    * day_of_week : VARCHAR(20)
+    * start_time : TIME
+    * end_time : TIME
+    * created_at : TIMESTAMPTZ
+}
+
+entity "attendance_sessions" as attendance_sessions {
+    * id : BIGINT <<PK>>
+    --
+    * course_id : BIGINT <<FK>>
+    * faculty_id : BIGINT <<FK>>
+    * session_date : DATE
+    topic : VARCHAR(255)
+    * created_at : TIMESTAMPTZ
+}
+
+entity "attendance_records" as attendance_records {
+    * id : BIGINT <<PK>>
+    --
+    * session_id : BIGINT <<FK>>
+    * student_id : BIGINT <<FK>>
+    * status : VARCHAR(50)
+    --
+    UQ: (session_id, student_id)
+}
+
+entity "course_assessments" as course_assessments {
+    * id : BIGINT <<PK>>
+    --
+    * course_id : BIGINT <<FK>>
+    * title : VARCHAR(255)
+    * type : VARCHAR(50)
+    * max_score : DOUBLE PRECISION
+    * weightage_percentage : DOUBLE PRECISION
+    * created_at : TIMESTAMPTZ
+}
+
+entity "student_grades" as student_grades {
+    * id : BIGINT <<PK>>
+    --
+    * assessment_id : BIGINT <<FK>>
+    * student_id : BIGINT <<FK>>
+    * score_obtained : DOUBLE PRECISION
+    comments : TEXT
+    * created_at : TIMESTAMPTZ
+    --
+    UQ: (assessment_id, student_id)
+}
+
+entity "announcements" as announcements {
+    * id : BIGINT <<PK>>
+    --
+    * title : VARCHAR(255)
+    * content : TEXT
+    * author_id : BIGINT <<FK>>
+    * target_role : VARCHAR(50)
+    * priority : VARCHAR(20)
+    * published_at : TIMESTAMPTZ
+    expires_at : TIMESTAMPTZ
+}
+
+entity "audit_logs" as audit_logs {
+    * id : BIGINT <<PK>>
+    --
+    * action : VARCHAR(100)
+    * entity_type : VARCHAR(100)
+    * entity_id : VARCHAR(100)
+    * username : VARCHAR(100)
+    details : TEXT
+    * timestamp : TIMESTAMPTZ
+}
+
+' Inheritance (Joined Table)
+persons ||--o| admins : "PK = ID"
+persons ||--o| faculty : "PK = ID"
+persons ||--o| students : "PK = ID"
+persons ||--|| user_accounts : "1 : 1"
+
+' Foreign Keys
+departments ||--o{ faculty : "employs"
+departments ||--o{ students : "enrolls"
+departments ||--o{ courses : "curriculum"
+courses |o--o{ faculty : "instructs"
+
+students ||--o{ enrollments : "registers"
+courses ||--o{ enrollments : "offered to"
+
+courses ||--o{ timetables : "scheduled"
+classrooms ||--o{ timetables : "allocated"
+faculty ||--o{ timetables : "teaches"
+
+courses ||--o{ attendance_sessions : "holds"
+faculty ||--o{ attendance_sessions : "conducts"
+attendance_sessions ||--o{ attendance_records : "records"
+students ||--o{ attendance_records : "attended by"
+
+courses ||--o{ course_assessments : "evaluates"
+course_assessments ||--o{ student_grades : "marks"
+students ||--o{ student_grades : "awarded to"
+
+persons ||--o{ announcements : "authored by"
+
+@enduml

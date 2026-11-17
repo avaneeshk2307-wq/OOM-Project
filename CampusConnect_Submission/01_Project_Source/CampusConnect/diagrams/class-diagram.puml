@@ -1,0 +1,345 @@
+@startuml class-diagram
+title CampusConnect - Complete Domain Object Model & GoF Design Patterns (Phase 1 & Phase 2)
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.campusconnect.entity (Core Domain Entities)" {
+
+    abstract class Person {
+        - Long id
+        - String name
+        - String email
+        - String phone
+        - AccountStatus accountStatus
+        - Instant createdAt
+        + getId(): Long
+        + getName(): String
+        + getEmail(): String
+        + getPhone(): String
+        + getAccountStatus(): AccountStatus
+        + updateContactInfo(String, String): void
+        + activate(): void
+        + deactivate(): void
+    }
+
+    class Student {
+        - String rollNumber
+        - int semester
+        + getRollNumber(): String
+        + getSemester(): int
+        + promoteToNextSemester(): void
+    }
+
+    class Faculty {
+        - String employeeCode
+        - String designation
+        + getEmployeeCode(): String
+        + getDesignation(): String
+    }
+
+    class Admin {
+        - String accessLevel
+        + getAccessLevel(): String
+    }
+
+    class Department {
+        - Long id
+        - String code
+        - String name
+        - String description
+        + getId(): Long
+        + getCode(): String
+        + getName(): String
+    }
+
+    class Course {
+        - Long id
+        - String code
+        - String title
+        - String description
+        - int credits
+        - int semester
+        - int capacity
+        + getId(): Long
+        + getCode(): String
+        + getTitle(): String
+        + getCredits(): int
+        + getCapacity(): int
+        + hasAvailableSeats(long): boolean
+        + assignInstructor(Faculty): void
+        + removeInstructor(): void
+    }
+
+    class Classroom {
+        - Long id
+        - String roomNumber
+        - String building
+        - int capacity
+        - RoomType roomType
+        + getId(): Long
+        + getRoomNumber(): String
+        + getBuilding(): String
+        + getCapacity(): int
+        + getRoomType(): RoomType
+    }
+
+    class TimetableEntry {
+        - Long id
+        - DayOfWeek dayOfWeek
+        - LocalTime startTime
+        - LocalTime endTime
+        - Course course
+        - Classroom classroom
+        - Faculty faculty
+        + getId(): Long
+        + getDayOfWeek(): DayOfWeek
+        + getStartTime(): LocalTime
+        + getEndTime(): LocalTime
+        + conflictsWith(TimetableEntry): boolean
+    }
+
+    class Notification {
+        - Long id
+        - UserAccount user
+        - String title
+        - String message
+        - NotificationType type
+        - boolean isRead
+        - Instant createdAt
+        + markAsRead(): void
+        + isRead(): boolean
+    }
+
+    class AuditLog {
+        - Long id
+        - AuditAction action
+        - String entityName
+        - String entityId
+        - String performedByUsername
+        - String details
+        - String ipAddress
+        - Instant createdAt
+        + getAction(): AuditAction
+        + getPerformedByUsername(): String
+        + getDetails(): String
+    }
+
+    class Enrollment {
+        - Long id
+        - EnrollmentStatus status
+        - Instant registeredAt
+        + getId(): Long
+        + getStatus(): EnrollmentStatus
+        + submit(): void
+        + approve(): void
+        + finalizeEnrollment(): void
+        + drop(): void
+        + reject(): void
+    }
+
+    class AssessmentComponent {
+        - Long id
+        - String name
+        - AssessmentType type
+        - BigDecimal maxMarks
+        - BigDecimal weightagePercentage
+        + getId(): Long
+        + getName(): String
+        + getMaxMarks(): BigDecimal
+        + getWeightagePercentage(): BigDecimal
+    }
+
+    class Grade {
+        - Long id
+        - BigDecimal marksObtained
+        - GradeLetter letterGrade
+        - double gradePoint
+        + getId(): Long
+        + getMarksObtained(): BigDecimal
+        + getLetterGrade(): GradeLetter
+        + getGradePoint(): double
+    }
+
+    class AttendanceSession {
+        - Long id
+        - LocalDate sessionDate
+        - String topic
+        + getId(): Long
+        + getSessionDate(): LocalDate
+        + getTopic(): String
+        + recordStudentAttendance(Student, AttendanceStatus, String): void
+    }
+
+    class AttendanceRecord {
+        - Long id
+        - AttendanceStatus status
+        - String remarks
+        + getStatus(): AttendanceStatus
+        + isPresent(): boolean
+    }
+
+    class UserAccount {
+        - Long id
+        - String username
+        - String passwordHash
+        - Role role
+        - boolean enabled
+        + getUsername(): String
+        + getRole(): Role
+        + isEnabled(): boolean
+    }
+}
+
+package "com.campusconnect.patterns.state (State Pattern)" {
+    interface EnrollmentState {
+        + request(Enrollment): void
+        + approve(Enrollment): void
+        + finalizeEnrollment(Enrollment): void
+        + drop(Enrollment): void
+        + reject(Enrollment): void
+        + getStatus(): EnrollmentStatus
+    }
+
+    class RequestedState implements EnrollmentState
+    class ApprovedState implements EnrollmentState
+    class EnrolledState implements EnrollmentState
+    class DroppedState implements EnrollmentState
+    class RejectedState implements EnrollmentState
+
+    class EnrollmentStateFactory {
+        + {static} getState(EnrollmentStatus): EnrollmentState
+    }
+}
+
+package "com.campusconnect.patterns.strategy (Strategy Pattern)" {
+    interface GradingStrategy {
+        + calculateGrade(BigDecimal, BigDecimal): GradingResult
+        + getStrategyName(): String
+    }
+
+    class AbsoluteGradingStrategy implements GradingStrategy {
+        + calculateGrade(BigDecimal, BigDecimal): GradingResult
+        + getStrategyName(): String
+    }
+
+    class RelativeGradingStrategy implements GradingStrategy {
+        + calculateRelativeGrades(List<StudentScore>): Map<Long, GradingResult>
+        + calculateGrade(BigDecimal, BigDecimal): GradingResult
+        + getStrategyName(): String
+    }
+
+    class GradingStrategyFactory {
+        + getStrategy(GradingMode): GradingStrategy
+        + getStrategyByName(String): GradingStrategy
+    }
+
+    class GradingResult <<record>> {
+        + GradeLetter gradeLetter
+        + double gradePoint
+        + double percentage
+        + String remark
+    }
+}
+
+package "com.campusconnect.event & Observer Pattern" {
+    class ApplicationEventPublisher <<Spring Framework>> {
+        + publishEvent(Object): void
+    }
+
+    class AcademicEventListener {
+        + onEnrollmentApproved(EnrollmentApprovedEvent): void
+        + onGradePublished(GradePublishedEvent): void
+        + onAttendanceShortage(AttendanceShortageEvent): void
+    }
+
+    class GradePublishedEvent <<record>>
+    class AttendanceShortageEvent <<record>>
+    class EnrollmentApprovedEvent <<record>>
+}
+
+package "com.campusconnect.patterns.builder (Builder Pattern)" {
+    interface TranscriptBuilder {
+        + reset(): void
+        + buildStudentInfo(Student): TranscriptBuilder
+        + buildAcademicSummary(int, double, String): TranscriptBuilder
+        + addCourseRecord(SemesterCourseRecord): TranscriptBuilder
+        + buildOfficialSignature(String, String): TranscriptBuilder
+        + getResult(): AcademicTranscriptReport
+    }
+
+    class ConcreteTranscriptBuilder implements TranscriptBuilder {
+        - AcademicTranscriptReport report
+        + reset(): void
+        + buildStudentInfo(Student): TranscriptBuilder
+        + buildAcademicSummary(int, double, String): TranscriptBuilder
+        + addCourseRecord(SemesterCourseRecord): TranscriptBuilder
+        + buildOfficialSignature(String, String): TranscriptBuilder
+        + getResult(): AcademicTranscriptReport
+    }
+
+    class TranscriptDirector {
+        - TranscriptBuilder builder
+        + constructTranscript(Student, List<Enrollment>, List<Grade>): AcademicTranscriptReport
+    }
+
+    class AcademicTranscriptReport {
+        - StudentBio bio
+        - AcademicSummary summary
+        - List<SemesterCourseRecord> courseRecords
+        - SecuritySignature signature
+    }
+}
+
+' Inheritance Hierarchies
+Person <|-- Student
+Person <|-- Faculty
+Person <|-- Admin
+
+' Aggregations & Associations
+Department "1" o-- "0..*" Student : belongs to
+Department "1" o-- "0..*" Faculty : member of
+Department "1" o-- "0..*" Course : offers
+Faculty "1" <-- "0..*" Course : instructor
+UserAccount "1" *-- "1" Person : credentials adapter
+
+' Timetable Associations
+Course "1" <-- "0..*" TimetableEntry : scheduled for
+Classroom "1" <-- "0..*" TimetableEntry : allocated in
+Faculty "1" <-- "0..*" TimetableEntry : conducted by
+
+' Notifications & Audit
+UserAccount "1" <-- "0..*" Notification : recipient
+AuditLog ..> UserAccount : records action of
+
+' Enrollment & State Pattern
+Student "1" <-- "0..*" Enrollment : student
+Course "1" <-- "0..*" Enrollment : course
+Enrollment ..> EnrollmentState : delegates transition to
+EnrollmentStateFactory ..> EnrollmentState : instantiates
+
+' Grading & Strategy Pattern
+Course "1" *-- "0..*" AssessmentComponent : composed of
+Enrollment "1" <-- "0..*" Grade : graded for
+AssessmentComponent "1" <-- "0..*" Grade : evaluated by
+Grade ..> GradingStrategy : evaluated using
+GradingStrategyFactory ..> GradingStrategy : instantiates
+
+' Attendance
+AttendanceSession "1" *-- "0..*" AttendanceRecord : composed of
+AttendanceSession "0..*" --> "1" Course : conducted for
+AttendanceRecord "0..*" --> "1" Student : recorded for
+
+' Observer Pattern Connections
+AcademicEventListener ..> Notification : generates persistent
+ApplicationEventPublisher ..> AcademicEventListener : triggers
+GradePublishedEvent ..> AcademicEventListener
+AttendanceShortageEvent ..> AcademicEventListener
+EnrollmentApprovedEvent ..> AcademicEventListener
+
+' Builder Pattern Connections
+TranscriptDirector o-- TranscriptBuilder : coordinates
+ConcreteTranscriptBuilder ..> AcademicTranscriptReport : produces
+
+@enduml

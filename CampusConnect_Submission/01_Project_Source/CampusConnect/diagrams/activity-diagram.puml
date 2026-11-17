@@ -1,0 +1,53 @@
+@startuml activity-diagram
+title CampusConnect - Class Meeting Attendance & Shortage Detection Activity
+start
+
+:Faculty selects Course from assigned teaching schedule;
+:Frontend queries active enrolled students roster;
+:Faculty sets Session Date and Lecture Topic;
+
+repeat
+    :Iterate over enrolled student;
+    if (Student is in class on time?) then (yes)
+        :Set Status = PRESENT;
+    else if (Student arrived late with reason?) then (yes)
+        :Set Status = LATE;
+        :Optionally append faculty remarks;
+    else (no)
+        :Set Status = ABSENT;
+        :Optionally append absence reason;
+    endif
+repeat while (more students in roster?) is (yes)
+->no;
+
+:Faculty submits attendance batch;
+:Backend AttendanceService validates session date & permissions;
+:Instantiate AttendanceSession aggregate root;
+
+:Loop through record payloads;
+:session.recordStudentAttendance(student, status, remarks);
+note right: Composition Invariant:\nLifecycle bound to AttendanceSession
+
+:attendanceSessionRepository.save(session);
+:PostgreSQL cascades persist to attendance_records;
+
+fork
+    :Return AttendanceSessionResponse with presentCount;
+fork again
+    :Student views personal attendance portal;
+    :Query countAttendedByCourseAndStudent();
+    :Query countTotalByCourseAndStudent();
+    :Calculate attendance percentage:\n(attendedSessions / totalSessions) * 100.0;
+    
+    if (percentage < 75.0% AND totalSessions > 0) then (yes)
+        #pink:Flag lowAttendanceWarning = true;
+        :Render Red Shortage Warning Banner in UI;
+        :Notify student of final exam ineligibility risk;
+    else (no)
+        #lightgreen:Flag lowAttendanceWarning = false;
+        :Render Good Academic Standing Badge;
+    endif
+end fork
+
+stop
+@enduml

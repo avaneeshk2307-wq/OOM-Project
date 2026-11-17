@@ -1,0 +1,57 @@
+@startuml state-diagram
+title CampusConnect - GoF State Pattern: Course Enrollment Lifecycle
+
+[*] --> DRAFT : Student creates enrollment draft\n[new Enrollment()]
+
+state DRAFT {
+    DRAFT : Initial creation state
+    DRAFT : Modifiable by student
+}
+
+DRAFT --> SUBMITTED : submit()\n[Student submits application]
+
+state SUBMITTED {
+    SUBMITTED : Application locked
+    SUBMITTED : Under Academic Administrator review
+}
+
+SUBMITTED --> APPROVED : approve()\n[Admin approves prerequisites & capacity]
+SUBMITTED --> REJECTED : reject()\n[Admin rejects application]
+
+state APPROVED {
+    APPROVED : Awaiting semester commencement
+    APPROVED : Seat reserved in course capacity
+}
+
+APPROVED --> ENROLLED : finalizeEnrollment()\n[Admin / Registrar confirms roster]
+APPROVED --> REJECTED : reject()\n[Admin cancels approval]
+
+state ENROLLED {
+    ENROLLED : Active participant in class meetings
+    ENROLLED : Attendance tracked
+    ENROLLED : Coursework evaluated & graded
+}
+
+ENROLLED --> DROPPED : drop()\n[Student or Admin drops before deadline]
+
+state DROPPED {
+    DROPPED : Course dropped
+    DROPPED : Seat released back to course capacity
+}
+
+state REJECTED {
+    REJECTED : Application denied
+    REJECTED : Terminal state
+}
+
+DROPPED --> [*]
+REJECTED --> [*]
+
+note right of DRAFT
+    <b>Encapsulated Invariant</b>:
+    State transitions are delegated to
+    polymorphic EnrollmentState implementations.
+    Direct illegal transitions throw IllegalStateException.
+end note
+
+@enduml
